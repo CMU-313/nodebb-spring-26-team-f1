@@ -59,7 +59,7 @@ define('forum/search', [
 			}
 		});
 
-		
+		fillOutForm();
 
 		// Inject 'only answered' checkbox into advanced search form if missing
 		if (!$('#filter-answered').length) {
@@ -72,8 +72,11 @@ define('forum/search', [
 					</div>`;
 			$('#advanced-search form').append(answeredHtml);
 		}
-		fillOutForm();
 
+		// When toggled, update internal filters but do NOT run the search automatically
+		$('#advanced-search').on('change', '#filter-answered', function () {
+			searchFilters = getSearchDataFromDOM();
+		});
 		updateTimeFilter();
 		updateReplyCountFilter();
 		updateSortFilter();
