@@ -73,10 +73,9 @@ define('forum/search', [
 			$('#advanced-search form').append(answeredHtml);
 		}
 
-		// When toggled, run search immediately
+		// When toggled, update internal filters but do NOT run the search automatically
 		$('#advanced-search').on('change', '#filter-answered', function () {
-			const searchFiltersNew = getSearchDataFromDOM();
-			searchModule.query(searchFiltersNew);
+			searchFilters = getSearchDataFromDOM();
 		});
 		updateTimeFilter();
 		updateReplyCountFilter();
