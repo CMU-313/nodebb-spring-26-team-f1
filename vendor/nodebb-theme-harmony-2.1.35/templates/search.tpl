@@ -30,7 +30,16 @@
 					<option value="posts" selected>[[search:show-results-as-posts]]</option>
 					<option value="topics">[[search:show-results-as-topics]]</option>
 				</select>
-
+				<!-- Only Answered filter -->
+				<div class="post-search-item">
+						<div class="form-check" id="answered-filter-wrapper">
+								<input class="form-check-input" type="checkbox" id="filter-answered" name="answered" value="1" />
+								<label class="form-check-label d-flex align-items-center gap-1" for="filter-answered">
+										<i class="fa fa-check-circle text-success"></i>
+										<span>Only Answered</span>
+								</label>
+						</div>
+				</div>
 				<button type="submit" class="btn btn-primary fw-semibold form-control py-2 px-3">[[global:search]]</button>
 			</form>
 		</div>

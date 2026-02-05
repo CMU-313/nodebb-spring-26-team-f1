@@ -1,8 +1,15 @@
 <li component="post" class="posts-list-item  {{{ if ./deleted }}} deleted{{{ else }}}{{{ if ./topic.deleted }}} deleted{{{ end }}}{{{ end }}}{{{ if ./topic.scheduled }}} scheduled{{{ end }}}" data-pid="{./pid}" data-uid="{./uid}">
     <hr/>
-    <a class="topic-title fw-semibold fs-5 mb-2 text-reset text-break d-block" href="{config.relative_path}/post/{encodeURIComponent(./pid)}">
-    {{{ if ./isMainPost }}}<i class="fa fa-book text-muted" title="[[topic:topic]]"></i> {{{ end }}}{./topic.title}
-    </a>
+    <div class="d-flex align-items-center gap-2">
+        <a class="topic-title fw-semibold fs-5 text-reset text-break" href="{config.relative_path}/post/{encodeURIComponent(./pid)}">
+                {{{ if !./isMainPost }}}RE: {{{ end }}}{./topic.title}
+        </a>
+        {{{ if ./topic.isAnswered }}}
+        <span class="badge text-bg-success d-inline-flex align-items-center gap-1 flex-shrink-0" title="Answered by {./topic.answeredBy} ({./topic.answeredByRole})">
+                <i class="fa fa-check-circle"></i> Answered
+        </span>
+        {{{ end }}}
+    </div>
 
     <div class="post-body d-flex flex-column gap-1 mb-2">
         <div class="d-flex gap-2 post-info text-sm align-items-center">
