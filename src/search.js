@@ -273,6 +273,11 @@ async function getMatchedPosts(pids, data) {
 		}
 	});
 
+	// If requested, only include posts whose topics are marked as answered
+	if (data && data.answered) {
+		postsData = postsData.filter(post => post && post.topic && parseInt(post.topic.isAnswered, 10) === 1);
+	}
+
 	return postsData.filter(post => post && post.topic && !post.topic.deleted);
 }
 

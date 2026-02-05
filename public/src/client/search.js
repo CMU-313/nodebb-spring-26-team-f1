@@ -60,6 +60,24 @@ define('forum/search', [
 		});
 
 		fillOutForm();
+
+		// Inject 'only answered' checkbox into advanced search form if missing
+		if (!$('#filter-answered').length) {
+			const answeredHtml = `
+				<div class="post-search-item">
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" id="filter-answered" />
+						<label class="form-check-label" for="filter-answered">[[search:only-answered]]</label>
+					</div>
+				</div>`;
+			$('#advanced-search form').append(answeredHtml);
+		}
+
+		// When toggled, run search immediately
+		$('#advanced-search').on('change', '#filter-answered', function () {
+			const searchFiltersNew = getSearchDataFromDOM();
+			searchModule.query(searchFiltersNew);
+		});
 		updateTimeFilter();
 		updateReplyCountFilter();
 		updateSortFilter();
@@ -132,6 +150,8 @@ define('forum/search', [
 			searchData.sortBy = form.find('#post-sort-by').val();
 			searchData.sortDirection = form.find('#post-sort-direction').val();
 			searchData.showAs = form.find('#show-results-as').val();
+			// answered filter (checkbox)
+			searchData.answered = !!form.find('#filter-answered').length && form.find('#filter-answered').is(':checked');
 		}
 
 		hooks.fire('action:search.getSearchDataFromDOM', {
@@ -207,6 +227,11 @@ define('forum/search', [
 				$('#post-sort-by').val(formData.sortBy || ajaxify.data.searchDefaultSortBy);
 			}
 			$('#post-sort-direction').val(formData.sortDirection || 'desc');
+
+			// restore answered checkbox state when present
+			if (formData.answered) {
+				$('#filter-answered').prop('checked', true);
+			}
 
 			hooks.fire('action:search.fillOutForm', {
 				form: formData,

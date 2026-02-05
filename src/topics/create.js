@@ -30,6 +30,8 @@ module.exports = function (Topics) {
 			cid: data.cid,
 			mainPid: 0,
 			title: data.title,
+			isAnswered: 0,
+			answeredBy: '',
 			slug: `${tid}/${slugify(data.title) || 'topic'}`,
 			timestamp: timestamp,
 			lastposttime: 0,
