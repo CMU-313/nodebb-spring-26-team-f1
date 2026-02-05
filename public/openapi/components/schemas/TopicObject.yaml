@@ -294,5 +294,22 @@ TopicObjectSlim:
         numThumbs:
           type: number
           description: The number of thumbnails associated with this topic
+        isAnswered:
+          type: number
+          description: Whether the topic has been answered by an instructor/admin/moderator
+        answeredBy:
+          type: string
+          nullable: true
+          description: Username of the user who answered
+        answeredByUid:
+          type: number
+          description: UID of the user who answered
+        answeredByRole:
+          type: string
+          nullable: true
+          description: Role of the answerer
+        answeredTimestamp:
+          type: number
+          description: UNIX timestamp of when the topic was marked as answered
       required:
         - tid
