@@ -71,6 +71,7 @@ searchController.search = async function (req, res, next) {
 		itemsPerPage: req.query.itemsPerPage,
 		uid: req.uid,
 		qs: req.query,
+		answered: req.query.answered === 'true' || req.query.answered === '1' || req.query.answered === true,
 	};
 
 	const [searchData] = await Promise.all([

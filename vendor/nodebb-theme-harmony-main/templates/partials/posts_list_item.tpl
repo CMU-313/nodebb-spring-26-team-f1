@@ -2,6 +2,7 @@
     <hr/>
     <a class="topic-title fw-semibold fs-5 mb-2 text-reset text-break d-block" href="{config.relative_path}/post/{encodeURIComponent(./pid)}">
     {{{ if ./isMainPost }}}<i class="fa fa-book text-muted" title="[[topic:topic]]"></i> {{{ end }}}{./topic.title}
+    {{{ if ./topic.isAnswered }}} <span class="badge bg-success ms-2">[[search:answered]]</span> {{{ end }}}
     </a>
 
     <div class="post-body d-flex flex-column gap-1 mb-2">

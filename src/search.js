@@ -225,6 +225,7 @@ async function filterAndSort(pids, data) {
 		!data.replies &&
 		!data.timeRange &&
 		!data.hasTags &&
+		!data.answered &&
 		data.searchIn !== 'bookmarks' &&
 		!plugins.hooks.hasListeners('filter:search.filterAndSort')) {
 		return pids;
@@ -238,6 +239,7 @@ async function filterAndSort(pids, data) {
 	postsData = filterByPostcount(postsData, data.replies, data.repliesFilter);
 	postsData = filterByTimerange(postsData, data.timeRange, data.timeFilter);
 	postsData = filterByTags(postsData, data.hasTags);
+	postsData = filterByAnswered(postsData, data.answered);
 
 	sortPosts(postsData, data);
 
@@ -272,6 +274,11 @@ async function getMatchedPosts(pids, data) {
 			post.user = uidToUser[post.uid];
 		}
 	});
+
+	// If requested, only include posts whose topics are marked as answered
+	if (data && data.answered) {
+		postsData = postsData.filter(post => post && post.topic && parseInt(post.topic.isAnswered, 10) === 1);
+	}
 
 	return postsData.filter(post => post && post.topic && !post.topic.deleted);
 }
@@ -324,6 +331,15 @@ function filterByPostcount(posts, postCount, repliesFilter) {
 		}
 	}
 	return posts;
+}
+
+function filterByAnswered(posts, answered) {
+	if (!answered) {
+		return posts;
+	}
+	return posts.filter(
+		post => post && post.topic && parseInt(post.topic.isAnswered, 10) === 1
+	);
 }
 
 function filterByTimerange(posts, timeRange, timeFilter) {

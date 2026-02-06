@@ -18,6 +18,11 @@ module.exports = function (Categories) {
 		let topicsData = await topics.getTopicsByTids(tids, data.uid);
 		topicsData = await user.blocks.filter(data.uid, topicsData);
 
+		// Optional filter: only include answered topics when requested
+		if (data && (data.answered === true || String(data.answered) === 'true')) {
+			topicsData = topicsData.filter(topic => topic && parseInt(topic.isAnswered, 10) === 1);
+		}
+
 		if (!topicsData.length) {
 			return { topics: [], uid: data.uid };
 		}

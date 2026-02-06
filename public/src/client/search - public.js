@@ -59,9 +59,24 @@ define('forum/search', [
 			}
 		});
 
-
 		fillOutForm();
 
+		// Inject 'only answered' checkbox into advanced search form if missing
+		if (!$('#filter-answered').length) {
+			const answeredHtml = `
+					<div class="post-search-item">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" id="filter-answered" name="answered" value="1" />
+							<label class="form-check-label" for="filter-answered">[[search:only-answered]]</label>
+						</div>
+					</div>`;
+			$('#advanced-search form').append(answeredHtml);
+		}
+
+		// When toggled, update internal filters but do NOT run the search automatically
+		$('#advanced-search').on('change', '#filter-answered', function () {
+			searchFilters = getSearchDataFromDOM();
+		});
 		updateTimeFilter();
 		updateReplyCountFilter();
 		updateSortFilter();

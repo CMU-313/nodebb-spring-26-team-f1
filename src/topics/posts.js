@@ -13,6 +13,7 @@ const activitypub = require('../activitypub');
 const plugins = require('../plugins');
 const utils = require('../utils');
 const privileges = require('../privileges');
+const groups = require('../groups');
 
 const backlinkRegex = new RegExp(`(?:${nconf.get('url').replace('/', '\\/')}|\b|\\s)\\/topic\\/(\\d+)(?:\\/\\w+)?`, 'g');
 
@@ -20,6 +21,37 @@ module.exports = function (Topics) {
 	Topics.onNewPostMade = async function (postData) {
 		await Topics.updateLastPostTime(postData.tid, postData.timestamp);
 		await Topics.addPostToTopic(postData.tid, postData);
+
+		// Mark topic as answered if an instructor/admin/mod replies
+		try {
+			const { tid, pid, uid } = postData;
+			const mainPid = await Topics.getTopicField(tid, 'mainPid');
+			if (mainPid && pid && String(pid) !== String(mainPid)) {
+				const cid = await Topics.getTopicField(tid, 'cid');
+				const [isAdmin, isAdminOrMod, isInstructor] = await Promise.all([
+					privileges.users.isAdministrator(uid),
+					privileges.categories.isAdminOrMod(cid, uid),
+					groups.isMember(uid, 'instructors'),
+				]);
+				if (isAdmin || isAdminOrMod || isInstructor) {
+					let roleTag = 'instructor';
+					if (isAdmin) {
+						roleTag = 'admin';
+					} else if (isAdminOrMod) {
+						roleTag = 'moderator';
+					}
+					await Topics.setTopicFields(tid, { isAnswered: 1, answeredBy: roleTag });
+					// maintain indexes for answered topics
+					await Promise.all([
+						db.sortedSetAdd('topics:answered', Date.now(), tid),
+						db.sortedSetAdd(`cid:${cid}:tids:answered`, Date.now(), tid),
+					]);
+				}
+			}
+		} catch (err) {
+			// don't let marking answered break post flow
+			console.error(err);
+		}
 	};
 
 	Topics.getTopicPosts = async function (topicData, set, start, stop, uid, reverse) {

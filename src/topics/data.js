@@ -14,6 +14,7 @@ const intFields = [
 	'deleted', 'locked', 'pinned', 'pinExpiry',
 	'timestamp', 'upvotes', 'downvotes',
 	'lastposttime', 'deleterUid',
+	'isAnswered',
 ];
 
 module.exports = function (Topics) {
@@ -147,5 +148,9 @@ function modifyTopic(topic, fields) {
 		} catch (e) {
 			topic.thumbs = [];
 		}
+	}
+
+	if (topic.hasOwnProperty('answeredBy')) {
+		topic.answeredBy = topic.answeredBy || null;
 	}
 }
