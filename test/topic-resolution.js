@@ -55,11 +55,11 @@ describe('Topic Resolution Feature', () => {
 			assert.strictEqual(topicData.resolvedBy, null, 'New topic should have null resolvedBy');
 		});
 
-		it('should have resolution fields available after migration', async () => {
+		it('should have resolution fields available after topic creation', async () => {
 			const topicData = await topics.getTopicData(testTid);
-			assert(topicData.hasOwnProperty('isResolved'), 'Topic should have isResolved field');
-			assert(topicData.hasOwnProperty('resolvedAt'), 'Topic should have resolvedAt field');
-			assert(topicData.hasOwnProperty('resolvedBy'), 'Topic should have resolvedBy field');
+			assert.strictEqual(topicData.isResolved, 0, 'isResolved should default to 0');
+			assert.strictEqual(topicData.resolvedAt, 0, 'resolvedAt should default to 0');
+			assert.strictEqual(topicData.resolvedBy || null, null, 'resolvedBy should be falsy');
 		});
 	});
 
