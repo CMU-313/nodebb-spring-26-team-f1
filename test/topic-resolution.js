@@ -1,11 +1,16 @@
 'use strict';
 
 const assert = require('assert');
-const db = require('../src/database');
+const nconf = require('nconf');
+const db = require('./mocks/databasemock');
 const topics = require('../src/topics');
 const posts = require('../src/posts');
+const categories = require('../src/categories');
 const privileges = require('../src/privileges');
+const groups = require('../src/groups');
 const user = require('../src/user');
+const helpers = require('./helpers');
+const request = require('../src/request');
 
 describe('Topic Resolution Feature', () => {
 	let studentUid;
@@ -283,6 +288,154 @@ describe('Topic Resolution Feature', () => {
 			assert.strictEqual(resolveData2.isResolved, resolveData1.isResolved, 'Resolution status should persist');
 			assert.strictEqual(resolveData2.resolvedAt, resolveData1.resolvedAt, 'Resolution timestamp should persist');
 			assert.strictEqual(resolveData2.resolvedBy, resolveData1.resolvedBy, 'Resolution info should persist');
+		});
+	});
+
+	describe('API Endpoints', () => {
+		let adminJar;
+		let studentJar;
+		let apiTestTid;
+
+		before(async () => {
+			const adminLogin = await helpers.loginUser('admin-user', 'password123');
+			adminJar = adminLogin.jar;
+
+			const studentLogin = await helpers.loginUser('student-user', 'password123');
+			studentJar = studentLogin.jar;
+
+			apiTestTid = await topics.create({
+				uid: studentUid,
+				cid: testCid,
+				title: 'API Test Topic for Resolution',
+				content: 'Test content for API endpoint testing',
+			});
+		});
+
+		describe('PUT /api/v3/topics/:tid/resolve', () => {
+			it('should return 403 if user is not admin/mod', async () => {
+				const { response } = await helpers.request('put', `/api/v3/topics/${apiTestTid}/resolve`, {
+					jar: studentJar,
+				});
+				assert.strictEqual(response.statusCode, 403);
+			});
+
+			it('should resolve topic when called by admin', async () => {
+				const { response } = await helpers.request('put', `/api/v3/topics/${apiTestTid}/resolve`, {
+					jar: adminJar,
+				});
+				assert.strictEqual(response.statusCode, 200);
+
+				const topicData = await topics.getTopicFields(apiTestTid, ['isResolved', 'resolvedAt', 'resolvedBy']);
+				assert.strictEqual(topicData.isResolved, 1);
+				assert(topicData.resolvedAt !== null);
+				assert(topicData.resolvedBy !== null);
+			});
+
+			it('should be idempotent when resolving already resolved topic', async () => {
+				const beforeData = await topics.getTopicFields(apiTestTid, ['resolvedAt']);
+
+				const { response } = await helpers.request('put', `/api/v3/topics/${apiTestTid}/resolve`, {
+					jar: adminJar,
+				});
+				assert.strictEqual(response.statusCode, 200);
+
+				const afterData = await topics.getTopicFields(apiTestTid, ['resolvedAt']);
+				assert.strictEqual(beforeData.resolvedAt, afterData.resolvedAt);
+			});
+		});
+
+		describe('DELETE /api/v3/topics/:tid/resolve', () => {
+			it('should return 403 if user is not admin/mod', async () => {
+				const { response } = await helpers.request('delete', `/api/v3/topics/${apiTestTid}/resolve`, {
+					jar: studentJar,
+				});
+				assert.strictEqual(response.statusCode, 403);
+			});
+
+			it('should unresolve topic when called by admin', async () => {
+				const { response } = await helpers.request('delete', `/api/v3/topics/${apiTestTid}/resolve`, {
+					jar: adminJar,
+				});
+				assert.strictEqual(response.statusCode, 200);
+
+				const topicData = await topics.getTopicFields(apiTestTid, ['isResolved', 'resolvedAt', 'resolvedBy']);
+				assert.strictEqual(topicData.isResolved, 0);
+				assert.strictEqual(topicData.resolvedAt, null);
+				assert.strictEqual(topicData.resolvedBy, null);
+			});
+		});
+
+		describe('GET /api/v3/topics/:tid (resolution metadata)', () => {
+			it('should return resolution metadata in topic response', async () => {
+				await topics.markAsResolved(apiTestTid, adminUid, testCid);
+
+				const { response, body } = await helpers.request('get', `/api/v3/topics/${apiTestTid}`, {
+					jar: adminJar,
+				});
+				assert.strictEqual(response.statusCode, 200);
+				assert.strictEqual(body.response.isResolved, 1);
+				assert(body.response.resolvedAt !== null);
+				assert(body.response.resolvedBy !== null);
+			});
+		});
+
+		describe('Resolved filter on category topics', () => {
+			let resolvedTid;
+			let unresolvedTid;
+
+			before(async () => {
+				resolvedTid = await topics.create({
+					uid: studentUid,
+					cid: testCid,
+					title: 'Resolved Filter Test - Resolved',
+					content: 'This topic will be resolved',
+				});
+				unresolvedTid = await topics.create({
+					uid: studentUid,
+					cid: testCid,
+					title: 'Resolved Filter Test - Unresolved',
+					content: 'This topic will remain unresolved',
+				});
+				await topics.markAsResolved(resolvedTid, adminUid, testCid);
+			});
+
+			it('should filter to only unresolved topics when resolved=false', async () => {
+				const result = await categories.getCategoryTopics({
+					cid: testCid,
+					uid: adminUid,
+					start: 0,
+					stop: 49,
+					resolved: 'false',
+				});
+				const tids = result.topics.map(t => t.tid);
+				assert(!tids.includes(resolvedTid), 'Should not include resolved topic');
+				assert(tids.includes(unresolvedTid), 'Should include unresolved topic');
+			});
+
+			it('should filter to only resolved topics when resolved=true', async () => {
+				const result = await categories.getCategoryTopics({
+					cid: testCid,
+					uid: adminUid,
+					start: 0,
+					stop: 49,
+					resolved: 'true',
+				});
+				const tids = result.topics.map(t => t.tid);
+				assert(tids.includes(resolvedTid), 'Should include resolved topic');
+				assert(!tids.includes(unresolvedTid), 'Should not include unresolved topic');
+			});
+
+			it('should return all topics when no resolved filter is set', async () => {
+				const result = await categories.getCategoryTopics({
+					cid: testCid,
+					uid: adminUid,
+					start: 0,
+					stop: 49,
+				});
+				const tids = result.topics.map(t => t.tid);
+				assert(tids.includes(resolvedTid), 'Should include resolved topic');
+				assert(tids.includes(unresolvedTid), 'Should include unresolved topic');
+			});
 		});
 	});
 

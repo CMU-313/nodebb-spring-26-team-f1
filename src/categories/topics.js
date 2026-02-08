@@ -23,6 +23,14 @@ module.exports = function (Categories) {
 			topicsData = topicsData.filter(topic => topic && parseInt(topic.isAnswered, 10) === 1);
 		}
 
+		// Optional filter: only include resolved/unresolved topics when requested
+		if (data && (data.resolved === true || String(data.resolved) === 'true')) {
+			topicsData = topicsData.filter(topic => topic && parseInt(topic.isResolved, 10) === 1);
+		}
+		if (data && (data.resolved === false || String(data.resolved) === 'false')) {
+			topicsData = topicsData.filter(topic => topic && parseInt(topic.isResolved, 10) !== 1);
+		}
+
 		if (!topicsData.length) {
 			return { topics: [], uid: data.uid };
 		}
