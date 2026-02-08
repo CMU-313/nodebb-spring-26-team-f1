@@ -1,11 +1,11 @@
 'use strict';
 
 const assert = require('assert');
-const db = require('../database');
-const topics = require('../topics');
-const posts = require('../posts');
-const privileges = require('../privileges');
-const user = require('../user');
+const db = require('../src/database');
+const topics = require('../src/topics');
+const posts = require('../src/posts');
+const privileges = require('../src/privileges');
+const user = require('../src/user');
 
 describe('Topic Resolution Feature', () => {
 	let studentUid;
@@ -24,7 +24,7 @@ describe('Topic Resolution Feature', () => {
 		await privileges.users.makeAdministrator(adminUid);
 		
 		// Create test category
-		const category = await require('../categories').create({
+		const category = await require('../src/categories').create({
 			name: 'Test Category',
 			description: 'Category for resolution tests',
 		});
