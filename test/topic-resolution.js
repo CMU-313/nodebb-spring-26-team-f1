@@ -25,8 +25,8 @@ describe('Topic Resolution Feature', () => {
 		moderatorUid = await user.create({ username: 'moderator-user', password: 'password123' });
 		adminUid = await user.create({ username: 'admin-user', password: 'password123' });
 
-		// Set moderator privileges
-		await privileges.users.makeAdministrator(adminUid);
+		// Make admin user an administrator
+		await groups.join('administrators', adminUid);
 		
 		// Create test category
 		const category = await require('../src/categories').create({
@@ -36,7 +36,7 @@ describe('Topic Resolution Feature', () => {
 		testCid = category.cid;
 
 		// Grant moderator privilege to moderatorUid in test category
-		await privileges.categories.give(['edit', 'topics:create', 'posts:create'], testCid, [moderatorUid]);
+		await privileges.categories.give(['moderate', 'topics:create', 'posts:create'], testCid, [moderatorUid]);
 	});
 
 	describe('Schema Initialization', () => {
