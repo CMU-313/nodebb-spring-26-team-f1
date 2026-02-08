@@ -311,5 +311,16 @@ TopicObjectSlim:
         answeredTimestamp:
           type: number
           description: UNIX timestamp of when the topic was marked as answered
+        isResolved:
+          type: number
+          description: Whether the topic has been marked as resolved (0 or 1)
+        resolvedAt:
+          type: number
+          nullable: true
+          description: UNIX timestamp of when the topic was resolved
+        resolvedBy:
+          type: string
+          nullable: true
+          description: JSON string containing uid and role of the resolver
       required:
         - tid
