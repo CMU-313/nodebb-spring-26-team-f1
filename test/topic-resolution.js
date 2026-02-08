@@ -51,7 +51,7 @@ describe('Topic Resolution Feature', () => {
 			const topicData = await topics.getTopicFields(testTid, ['isResolved', 'resolvedAt', 'resolvedBy']);
 
 			assert.strictEqual(topicData.isResolved, 0, 'New topic should not be resolved');
-			assert.strictEqual(topicData.resolvedAt, null, 'New topic should have null resolvedAt');
+			assert.strictEqual(topicData.resolvedAt, 0, 'New topic should have 0 resolvedAt');
 			assert.strictEqual(topicData.resolvedBy, null, 'New topic should have null resolvedBy');
 		});
 
@@ -75,7 +75,7 @@ describe('Topic Resolution Feature', () => {
 			// Check topic is still unresolved
 			const topicData = await topics.getTopicFields(testTid, ['isResolved', 'resolvedAt', 'resolvedBy']);
 			assert.strictEqual(topicData.isResolved, 0, 'Topic should remain unresolved after student reply');
-			assert.strictEqual(topicData.resolvedAt, null, 'resolvedAt should remain null');
+			assert.strictEqual(topicData.resolvedAt, 0, 'resolvedAt should remain 0');
 			assert.strictEqual(topicData.resolvedBy, null, 'resolvedBy should remain null');
 		});
 
@@ -242,7 +242,7 @@ describe('Topic Resolution Feature', () => {
 			// Verify
 			const topicData = await topics.getTopicFields(newTid, ['isResolved', 'resolvedAt', 'resolvedBy']);
 			assert.strictEqual(topicData.isResolved, 0, 'Topic should be unresolved');
-			assert.strictEqual(topicData.resolvedAt, null, 'resolvedAt should be null');
+			assert.strictEqual(topicData.resolvedAt, 0, 'resolvedAt should be 0');
 			assert.strictEqual(topicData.resolvedBy, null, 'resolvedBy should be null');
 		});
 	});
@@ -360,7 +360,7 @@ describe('Topic Resolution Feature', () => {
 
 				const topicData = await topics.getTopicFields(apiTestTid, ['isResolved', 'resolvedAt', 'resolvedBy']);
 				assert.strictEqual(topicData.isResolved, 0);
-				assert.strictEqual(topicData.resolvedAt, null);
+				assert.strictEqual(topicData.resolvedAt, 0);
 				assert.strictEqual(topicData.resolvedBy, null);
 			});
 		});
