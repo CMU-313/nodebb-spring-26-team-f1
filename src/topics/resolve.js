@@ -79,11 +79,10 @@ module.exports = function (Topics) {
 	 * @returns {Promise<void>}
 	 */
 	Topics.markAsUnresolved = async function (tid) {
-		await db.setObject(`topic:${tid}`, {
-			isResolved: 0,
-			resolvedAt: null,
-			resolvedBy: null,
-		});
+		await Promise.all([
+			db.setObject(`topic:${tid}`, { isResolved: 0 }),
+			db.deleteObjectFields(`topic:${tid}`, ['resolvedAt', 'resolvedBy']),
+		]);
 	};
 
 	/**
