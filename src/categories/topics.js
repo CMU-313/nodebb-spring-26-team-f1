@@ -13,14 +13,41 @@ const utils = require('../utils');
 
 module.exports = function (Categories) {
 	Categories.getCategoryTopics = async function (data) {
+		if (data) {
+			if (typeof data.resolved === 'string') {
+				const rv = data.resolved.toLowerCase();
+				if (rv === 'false' || rv === '0' || rv === 'unanswered') {
+					data.resolved = false;
+				} else if (rv === 'true' || rv === '1' || rv === 'answered') {
+					data.resolved = true;
+				} else {
+					delete data.resolved;
+				}
+			}
+			if (typeof data.answered === 'string') {
+				const av = data.answered.toLowerCase();
+				if (av === 'false' || av === '0' || av === 'no') {
+					data.answered = false;
+				} else if (av === 'true' || av === '1' || av === 'yes') {
+					data.answered = true;
+				} else {
+					delete data.answered;
+				}
+			}
+		}
 		let results = await plugins.hooks.fire('filter:category.topics.prepare', data);
 		const tids = await Categories.getTopicIds(results);
-		let topicsData = await topics.getTopicsByTids(tids, data.uid);
+		let topicsData = await topics.getTopicsByTids(tids, { uid: data.uid, fields: ['tid', 'uid', 'cid', 'title', 'slug', 'timestamp', 'lastposttime', 'postcount', 'viewcount', 'isResolved'] });
 		topicsData = await user.blocks.filter(data.uid, topicsData);
 
 		// Optional filter: only include answered topics when requested
 		if (data && (data.answered === true || String(data.answered) === 'true')) {
 			topicsData = topicsData.filter(topic => topic && parseInt(topic.isAnswered, 10) === 1);
+		}
+
+		// Optional filter: only include unanswered topics when requested
+		if (data && (data.answered === false || String(data.answered) === 'false')) {
+			topicsData = topicsData.filter(topic => topic && parseInt(topic.isAnswered, 10) !== 1);
 		}
 
 		// Optional filter: only include resolved/unresolved topics when requested

@@ -45,6 +45,21 @@
 </div>
 {{{ end }}}
 
+<div class="topic-list-filters mb-3" id="topic-filters">
+    <div class="btn-group btn-group-sm" role="group">
+		<a href="?answered=" role="button" class="btn btn-outline-secondary filter-tab active" data-resolved="">
+			<i class="fa fa-list"></i> All Questions
+		</a>
+		<a href="?answered=false" role="button" class="btn btn-outline-secondary filter-tab" data-resolved="false">
+			<i class="fa fa-question-circle text-danger"></i> Unanswered
+		</a>
+		<a href="?answered=true" role="button" class="btn btn-outline-secondary filter-tab" data-resolved="true">
+			<i class="fa fa-check-circle text-success"></i> Answered
+		</a>
+    </div>
+</div>
+
+<!-- Inline filter script removed. Client behavior handled by public client module `forum/category` (category.js) -->
 
 <div class="row flex-fill mt-3">
 	<div class="category d-flex flex-column {{{if widgets.sidebar.length }}}col-lg-9 col-sm-12{{{ else }}}col-lg-12{{{ end }}}">
