@@ -193,6 +193,8 @@ module.exports = function (Topics) {
 
 	Topics.modifyPostsByPrivilege = function (topicData, topicPrivileges) {
 		const loggedIn = parseInt(topicPrivileges.uid, 10) > 0;
+		const viewerIsPrivileged = topicPrivileges.isAdminOrMod;
+
 		topicData.posts.forEach((post) => {
 			if (post) {
 				post.topicOwnerPost = parseInt(topicData.uid, 10) === parseInt(post.uid, 10);
@@ -206,9 +208,47 @@ module.exports = function (Topics) {
 					((loggedIn || topicData.postSharing.length) && !post.deleted);
 				post.ip = topicPrivileges.isAdminOrMod ? post.ip : undefined;
 
+				// Mask anonymous post author info for non-privileged viewers
+				if (post.isAnonymous && !viewerIsPrivileged) {
+					Topics.maskAnonymousPostUser(post);
+				}
+
+				// Mark anonymous posts for instructors so they see the indicator
+				if (post.isAnonymous && viewerIsPrivileged) {
+					post.isAnonymousToInstructor = true;
+				}
+
 				posts.modifyPostByPrivilege(post, topicPrivileges);
 			}
 		});
+	};
+
+	Topics.maskAnonymousPostUser = function (post) {
+		if (!post || !post.user) {
+			return;
+		}
+		post.user = {
+			uid: 0,
+			username: 'Anonymous',
+			displayname: 'Anonymous',
+			userslug: '',
+			picture: '',
+			'icon:text': '?',
+			'icon:bgColor': '#aaa',
+			status: 'offline',
+			reputation: 0,
+			postcount: 0,
+			topiccount: 0,
+			signature: '',
+			banned: false,
+			selectedGroups: [],
+			custom_profile_info: [],
+		};
+		post.selfPost = false;
+		post.display_edit_tools = false;
+		post.display_delete_tools = false;
+		post.display_moderator_tools = false;
+		post.display_move_tools = false;
 	};
 
 	Topics.addParentPosts = async function (postData, callerUid) {
