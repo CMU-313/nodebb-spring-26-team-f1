@@ -1,1 +1,10 @@
 // global bs5 overrides if necessary
+
+/* Visual emphasis for older unanswered topics */
+.unanswered-old {
+	border-left: 4px solid rgba(220,53,69,0.12);
+}
+
+.unanswered-old [component="topic/labels"] .badge.text-bg-danger {
+	box-shadow: 0 0 0 3px rgba(220,53,69,0.04);
+}

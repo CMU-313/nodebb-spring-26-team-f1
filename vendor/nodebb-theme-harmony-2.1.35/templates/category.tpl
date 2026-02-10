@@ -51,6 +51,7 @@
 		<!-- IMPORT partials/category/subcategory.tpl -->
 		{{{ if (topics.length || privileges.topics:create) }}}
 		<!-- IMPORT partials/topic-list-bar.tpl -->
+		<!-- IMPORT partials/category/resolution.tpl -->
 		{{{ end }}}
 
 		{{{ if (./inbox && (./hasFollowers == false)) }}}

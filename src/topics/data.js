@@ -121,6 +121,26 @@ function modifyTopic(topic, fields) {
 		topic.pinExpiryISO = utils.toISOString(topic.pinExpiry);
 	}
 
+	if (topic.hasOwnProperty('resolvedAt')) {
+		topic.resolvedAtISO = utils.toISOString(topic.resolvedAt);
+	}
+
+	if (topic.hasOwnProperty('resolvedBy')) {
+		try {
+			// resolvedBy stored as JSON string { uid, role }
+			const rb = typeof topic.resolvedBy === 'string' ? JSON.parse(topic.resolvedBy) : topic.resolvedBy;
+			topic.resolvedBy = rb || null;
+			if (rb && rb.uid) {
+				topic.resolvedByUid = rb.uid;
+			}
+			if (rb && rb.role) {
+				topic.resolvedByRole = rb.role;
+			}
+		} catch (e) {
+			topic.resolvedBy = null;
+		}
+	}
+
 	if (topic.hasOwnProperty('upvotes') && topic.hasOwnProperty('downvotes')) {
 		topic.votes = topic.upvotes - topic.downvotes;
 	}

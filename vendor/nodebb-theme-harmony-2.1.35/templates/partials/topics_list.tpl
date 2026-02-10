@@ -1,7 +1,7 @@
 <ul component="category" class="topics-list list-unstyled" itemscope itemtype="http://www.schema.org/ItemList" data-nextstart="{nextStart}" data-set="{set}">
 
 	{{{ each topics }}}
-	<li component="category/topic" class="category-item hover-parent border-bottom py-3 py-lg-4 d-flex flex-column flex-lg-row align-items-start {function.generateTopicClass}" <!-- IMPORT partials/data/category.tpl -->>
+	<li component="category/topic" class="category-item hover-parent border-bottom py-3 py-lg-4 d-flex flex-column flex-lg-row align-items-start {function.generateTopicClass}" data-tid="{./tid}" data-resolved="{./isResolved}" data-resolved-at="{./resolvedAtISO}" data-resolved-by="{./resolvedByUid}" <!-- IMPORT partials/data/category.tpl -->>
 		<link itemprop="url" content="{config.relative_path}/topic/{./slug}" />
 		<meta itemprop="name" content="{function.stripTags, ./title}" />
 		<meta itemprop="itemListOrder" content="descending" />
@@ -71,12 +71,18 @@
 
 					<a href="{config.relative_path}/topic/{./slug}" class="d-none d-lg-block badge bg-transparent text-muted fw-normal timeago" title="{./timestampISO}"></a>
 				</span>
-				{{{ if ./isAnswered }}}
-				<span class="badge text-bg-success d-inline-flex align-items-center gap-1" title="Answered by {./answeredBy} ({./answeredByRole})">
-						<i class="fa fa-check-circle"></i>
-						<span>Answered</span>
-				</span>
-				{{{ end }}}
+		{{{ if ./isAnswered }}}
+		<span class="badge text-bg-success d-inline-flex align-items-center gap-1" title="Answered by {./answeredBy} ({./answeredByRole})">
+			<i class="fa fa-check-circle"></i>
+			<span>Answered</span>
+		</span>
+		{{{ end }}}
+		{{{ if !./isResolved }}}
+		<span class="badge text-bg-danger d-inline-flex align-items-center gap-1" title="Unanswered">
+		    <i class="fa fa-exclamation-circle"></i>
+		    <span>Unanswered</span>
+		</span>
+		{{{ end }}}
 				{{{ if showSelect }}}
 				<div class="checkbox position-absolute top-0 end-0 m-0 d-flex d-lg-none" style="max-width:max-content">
 					<i component="topic/select" class="fa fa-square-o text-muted pointer p-1"></i>

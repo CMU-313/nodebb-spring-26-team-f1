@@ -54,7 +54,66 @@ define('forum/category', [
 
 		hooks.fire('action:topics.loaded', { topics: ajaxify.data.topics });
 		hooks.fire('action:category.loaded', { cid: ajaxify.data.cid });
+
+		// resolution filter client wiring: make filter links ajaxify and update active state
+		setupResolutionFilter();
 	};
+	function setupResolutionFilter() {
+		// Handle clicks for our resolution filter buttons so navigation is ajaxified
+		$(document).on('click', '[component="resolution/filter"] a', function (e) {
+			e.preventDefault();
+			const href = $(this).attr('href');
+			if (href) {
+				ajaxify.go(href);
+			}
+			return false;
+		});
+
+		// When topics are loaded, decorate unresolved/older topics
+		hooks.register('action:topics.loaded', function () {
+			const thresholdMs = 1000 * 60 * 60 * 24 * 2; // 48 hours
+			$('[component="category/topic"]').each(function () {
+				const $li = $(this);
+				const resolvedAttr = $li.attr('data-resolved');
+				const resolved = resolvedAttr === 'true' || resolvedAttr === '1' || resolvedAttr === 'yes';
+				if (!resolved) {
+					// highlight older unanswered topics
+					let timeIso = $li.find('.timeago').attr('title') || $li.find('.timeago').data('iso');
+					if (!timeIso) {
+						// fallback: try the teaser timestamp
+						timeIso = $li.find('[component="topic/teaser"] .timeago').attr('title');
+					}
+					if (timeIso) {
+						const ts = Date.parse(timeIso);
+						if (ts && (Date.now() - ts) > thresholdMs) {
+							$li.addClass('unanswered-old');
+						} else {
+							$li.removeClass('unanswered-old');
+						}
+					}
+				} else {
+					$li.removeClass('unanswered-old');
+				}
+			});
+		});
+
+		// set active state on filter buttons based on query params
+		try {
+			const params = utils.params();
+			const resolvedParam = params.resolved;
+			const $links = $('[component="resolution/filter"] a');
+			$links.removeClass('active');
+			if (resolvedParam === 'true') {
+				$links.filter(function () { return $(this).attr('href') && $(this).attr('href').indexOf('resolved=true') !== -1; }).addClass('active');
+			} else if (resolvedParam === 'false') {
+				$links.filter(function () { return $(this).attr('href') && $(this).attr('href').indexOf('resolved=false') !== -1; }).addClass('active');
+			} else {
+				$links.first().addClass('active');
+			}
+		} catch (e) {
+			// ignore if utils not available for any reason
+		}
+	}
 
 	function handleScrollToTopicIndex() {
 		let topicIndex = ajaxify.data.topicIndex;
