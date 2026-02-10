@@ -130,6 +130,19 @@ Topics.getTopicsByTids = async function (tids, options) {
 		user.getSettings(uid),
 	]);
 
+	const mainPids = result.topics.map(topic => topic && topic.mainPid).filter(Boolean);
+	const cids = _.uniq(result.topics.map(topic => topic && topic.cid).filter(Boolean));
+	const [isAdmin, isModerator, mainPostData] = await Promise.all([
+		user.isAdministrator(uid),
+		cids.length ? user.isModerator(uid, cids) : [],
+		mainPids.length ? posts.getPostsFields(mainPids, ['pid', 'isAnonymous']) : [],
+	]);
+	const isModeratorByCid = _.zipObject(cids, isModerator);
+	const mainPidToIsAnonymous = _.zipObject(
+		mainPostData.map(post => post.pid),
+		mainPostData.map(post => post.isAnonymous)
+	);
+
 	const sortNewToOld = callerSettings.topicPostSort === 'newest_to_oldest';
 	result.topics.forEach((topic, i) => {
 		if (topic) {
@@ -139,6 +152,17 @@ Topics.getTopicsByTids = async function (tids, options) {
 			if (result.tidToGuestHandle[topic.tid]) {
 				topic.user.username = validator.escape(result.tidToGuestHandle[topic.tid]);
 				topic.user.displayname = topic.user.username;
+			}
+
+			const isMainAnonymous = mainPidToIsAnonymous[topic.mainPid];
+			const viewerIsPrivileged = isAdmin || isModeratorByCid[topic.cid];
+			if (isMainAnonymous && !viewerIsPrivileged) {
+				const masked = { uid: topic.uid, user: topic.user };
+				Topics.maskAnonymousPostUser(masked);
+				topic.uid = masked.uid;
+				topic.user = masked.user;
+			} else if (isMainAnonymous && viewerIsPrivileged) {
+				topic.isAnonymousToInstructor = true;
 			}
 			topic.teaser = result.teasers[i] || null;
 			topic.isOwner = topic.uid === parseInt(uid, 10);

@@ -268,7 +268,6 @@ get:
                         - name
                         - updated
                         - latest
-                        - url
                         - numInstalls
                         - isCompatible
                         - id
@@ -309,7 +308,6 @@ get:
                         - name
                         - updated
                         - latest
-                        - url
                         - numInstalls
                         - isCompatible
                         - id

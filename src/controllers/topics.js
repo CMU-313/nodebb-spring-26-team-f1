@@ -371,6 +371,7 @@ topicsController.teaser = async function (req, res, next) {
 	if (!canRead) {
 		return res.status(403).json('[[error:no-privileges]]');
 	}
+	const topicPrivileges = await privileges.topics.get(tid, req.uid);
 	const pid = await topics.getLatestUndeletedPid(tid);
 	if (!pid) {
 		return res.status(404).json('not-found');
@@ -379,7 +380,15 @@ topicsController.teaser = async function (req, res, next) {
 	if (!postData.length) {
 		return res.status(404).json('not-found');
 	}
-	res.json(postData[0]);
+	const teaser = postData[0];
+	if (teaser && teaser.isAnonymous) {
+		if (!topicPrivileges.isAdminOrMod) {
+			topics.maskAnonymousPostUser(teaser);
+		} else {
+			teaser.isAnonymousToInstructor = true;
+		}
+	}
+	res.json(teaser);
 };
 
 topicsController.pagination = async function (req, res, next) {

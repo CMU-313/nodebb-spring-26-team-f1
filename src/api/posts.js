@@ -63,8 +63,16 @@ postsAPI.getSummary = async (caller, { pid }) => {
 	}
 
 	const postsData = await posts.getPostSummaryByPids([pid], caller.uid, { stripTags: false });
-	posts.modifyPostByPrivilege(postsData[0], topicPrivileges);
-	return postsData[0];
+	const postSummary = postsData[0];
+	posts.modifyPostByPrivilege(postSummary, topicPrivileges);
+	if (postSummary && postSummary.isAnonymous) {
+		if (!topicPrivileges.isAdminOrMod) {
+			topics.maskAnonymousPostUser(postSummary);
+		} else {
+			postSummary.isAnonymousToInstructor = true;
+		}
+	}
+	return postSummary;
 };
 
 postsAPI.getRaw = async (caller, { pid }) => {
@@ -489,7 +497,7 @@ postsAPI.getDiffs = async (caller, data) => {
 	await diffsPrivilegeCheck(data.pid, caller.uid);
 	const [timestamps, post, diffs] = await Promise.all([
 		posts.diffs.list(data.pid),
-		posts.getPostFields(data.pid, ['timestamp', 'uid']),
+		posts.getPostFields(data.pid, ['timestamp', 'uid', 'isAnonymous']),
 		posts.diffs.get(data.pid),
 	]);
 
@@ -503,6 +511,9 @@ postsAPI.getDiffs = async (caller, data) => {
 		user.isAdministrator(caller.uid),
 		privileges.users.isModerator(caller.uid, cid),
 	]);
+	const viewerIsPrivileged = isAdmin || isModerator;
+	const maskAnonymous = post && post.isAnonymous && !viewerIsPrivileged;
+	const anonymousLabel = 'Anonymous';
 
 	// timestamps returned by posts.diffs.list are strings
 	timestamps.push(String(post.timestamp));
@@ -512,8 +523,8 @@ postsAPI.getDiffs = async (caller, data) => {
 		timestamps: timestamps,
 		revisions: timestamps.map((timestamp, idx) => ({
 			timestamp: timestamp,
-			username: usernames[idx],
-			uid: uids[idx],
+			username: maskAnonymous ? anonymousLabel : usernames[idx],
+			uid: maskAnonymous ? 0 : uids[idx],
 		})),
 		// Only admins, global mods and moderator of that cid can delete a diff
 		deletable: isAdmin || isModerator,

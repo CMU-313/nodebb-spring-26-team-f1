@@ -71,6 +71,31 @@ define('forum/topic/posts', [
 				(post.selfPost && !ajaxify.data.locked && !post.deleted) ||
 				(post.selfPost && post.deleted && parseInt(post.deleterUid, 10) === parseInt(app.user.uid, 10)) ||
 				((app.user.uid || ajaxify.data.postSharing.length) && !post.deleted);
+
+			// Mask anonymous post author info for non-privileged viewers
+			if (post.isAnonymous && !ajaxify.data.privileges.isAdminOrMod) {
+				post.user = {
+					uid: 0,
+					username: 'Anonymous',
+					displayname: 'Anonymous',
+					userslug: '',
+					picture: '',
+					'icon:text': '?',
+					'icon:bgColor': '#aaa',
+					status: 'offline',
+					selectedGroups: [],
+				};
+				post.selfPost = false;
+				post.display_edit_tools = false;
+				post.display_delete_tools = false;
+				post.display_moderator_tools = false;
+				post.display_move_tools = false;
+			}
+
+			// Mark anonymous posts for instructors
+			if (post.isAnonymous && ajaxify.data.privileges.isAdminOrMod) {
+				post.isAnonymousToInstructor = true;
+			}
 		});
 	};
 
