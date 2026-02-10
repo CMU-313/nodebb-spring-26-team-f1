@@ -227,6 +227,7 @@ module.exports = function (Topics) {
 		if (!post || !post.user) {
 			return;
 		}
+		post.uid = 0;
 		post.user = {
 			uid: 0,
 			username: 'Anonymous',
@@ -245,10 +246,12 @@ module.exports = function (Topics) {
 			custom_profile_info: [],
 		};
 		post.selfPost = false;
+		post.topicOwnerPost = false;
 		post.display_edit_tools = false;
 		post.display_delete_tools = false;
 		post.display_moderator_tools = false;
 		post.display_move_tools = false;
+		post.display_post_menu = false;
 	};
 
 	Topics.addParentPosts = async function (postData, callerUid) {

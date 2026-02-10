@@ -40,6 +40,13 @@ module.exports = function (Posts) {
 		const tidToTopic = toObject('tid', topicsAndCategories.topics);
 		const cidToCategory = toObject('cid', topicsAndCategories.categories);
 
+		const cids = _.uniq(topicsAndCategories.topics.map(topic => topic && topic.cid).filter(Boolean));
+		const [isAdmin, isModerator] = await Promise.all([
+			user.isAdministrator(uid),
+			cids.length ? user.isModerator(uid, cids) : [],
+		]);
+		const isModeratorByCid = _.zipObject(cids, isModerator);
+
 		posts.forEach((post) => {
 			// If the post author isn't represented in the retrieved users' data,
 			// then it means they were deleted, assume guest.
@@ -55,6 +62,14 @@ module.exports = function (Posts) {
 			post.handle = undefined;
 			post.topic = tidToTopic[post.tid];
 			post.category = post.topic && cidToCategory[post.topic.cid];
+
+			const viewerIsPrivileged = isAdmin || (post.topic && isModeratorByCid[post.topic.cid]);
+			if (post.isAnonymous && !viewerIsPrivileged) {
+				topics.maskAnonymousPostUser(post);
+			}
+			if (post.isAnonymous && viewerIsPrivileged) {
+				post.isAnonymousToInstructor = true;
+			}
 			post.isMainPost = post.topic && post.pid === post.topic.mainPid;
 			post.deleted = post.deleted === 1;
 			post.timestampISO = utils.toISOString(post.timestamp);
