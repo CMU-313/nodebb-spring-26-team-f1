@@ -53,6 +53,16 @@ Categories.getCategoryById = async function (data) {
 	const category = categories[0];
 	data.category = category;
 
+	// Support passing query-resolved from HTTP query string (e.g. ?resolved=true)
+	if (data.query && typeof data.query.resolved !== 'undefined') {
+		data.resolved = data.query.resolved;
+	}
+
+	// Support passing query-answered from HTTP query string (e.g. ?answered=true)
+	if (data.query && typeof data.query.answered !== 'undefined') {
+		data.answered = data.query.answered;
+	}
+
 	const promises = [
 		data.cid !== '-1' ? Categories.getCategoryTopics(data) : [],
 		Categories.getTopicCount(data),
