@@ -79,6 +79,8 @@ get:
                       sourceContent:
                         type: string
                         description: The markdown equivalent of a remote post content, as received (or fetched) from the remote site.
+                      isAnonymous:
+                        type: number
                     required:
                       - pid
 put:

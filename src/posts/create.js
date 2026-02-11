@@ -39,6 +39,9 @@ module.exports = function (Posts) {
 		if (data.handle && !parseInt(uid, 10)) {
 			postData.handle = data.handle;
 		}
+		if (data.isAnonymous && parseInt(uid, 10) > 0) {
+			postData.isAnonymous = 1;
+		}
 		if (_activitypub) {
 			if (_activitypub.url) {
 				postData.url = _activitypub.url;
@@ -84,6 +87,7 @@ module.exports = function (Posts) {
 			addReplyTo(postData, timestamp),
 			Posts.uploads.sync(pid),
 			hasAttachment ? Posts.attachments.update(pid, _activitypub.attachment) : null,
+			topics.autoResolveIfNeeded(tid, uid, topicData.cid),
 		]);
 
 		const result = await plugins.hooks.fire('filter:post.get', { post: postData, uid: data.uid });

@@ -143,6 +143,8 @@ get:
                                 sourceContent:
                                   type: string
                                   nullable: true
+                                isAnonymous:
+                                  type: number
                                 timestampISO:
                                   type: string
                                   description: An ISO 8601 formatted date string (complementing `timestamp`)

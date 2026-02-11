@@ -165,6 +165,25 @@ topicsAPI.unlock = async function (caller, data) {
 	});
 };
 
+topicsAPI.resolve = async function (caller, { tid }) {
+	const isAdminOrMod = await privileges.topics.isAdminOrMod(tid, caller.uid);
+	if (!isAdminOrMod) {
+		throw new Error('[[error:no-privileges]]');
+	}
+	const topicData = await topics.getTopicFields(tid, ['cid', 'isResolved']);
+	if (parseInt(topicData.isResolved, 10) !== 1) {
+		await topics.markAsResolved(tid, caller.uid, topicData.cid);
+	}
+};
+
+topicsAPI.unresolve = async function (caller, { tid }) {
+	const isAdminOrMod = await privileges.topics.isAdminOrMod(tid, caller.uid);
+	if (!isAdminOrMod) {
+		throw new Error('[[error:no-privileges]]');
+	}
+	await topics.markAsUnresolved(tid);
+};
+
 topicsAPI.follow = async function (caller, data) {
 	await topics.follow(data.tid, caller.uid);
 };
