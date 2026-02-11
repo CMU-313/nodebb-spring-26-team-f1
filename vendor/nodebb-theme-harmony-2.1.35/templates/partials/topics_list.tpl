@@ -48,17 +48,6 @@
 						<i class="fa fa-arrow-circle-right"></i>
 						<span>[[topic:moved]]</span>
 					</span>
-					<span component="topic/resolution-unanswered" class="badge text-bg-danger {{{ if ./isAnswered }}}hidden{{{ end }}}">
-						<i class="fa fa-question-circle"></i>
-						<span>[[search:unanswered]]</span>
-					</span>
-					<span component="topic/resolution-answered" class="badge text-bg-success {{{ if !./isAnswered }}}hidden{{{ end }}}">
-						<i class="fa fa-check-circle"></i>
-						<span>[[search:answered]]</span>
-					</span>
-					{{{ if !./isAnswered }}}
-					<span class="badge border border-gray-300 text-body text-muted"><span class="text-muted text-xs">[[topic:posted]]</span> <span class="timeago" title="{./timestampISO}"></span></span>
-					{{{ end }}}
 					{{{each ./icons}}}<span class="lh-1">{@value}</span>{{{end}}}
 
 					{{{ if (!template.category || (cid != ./cid)) }}}
@@ -82,6 +71,12 @@
 
 					<a href="{config.relative_path}/topic/{./slug}" class="d-none d-lg-block badge bg-transparent text-muted fw-normal timeago" title="{./timestampISO}"></a>
 				</span>
+				{{{ if ./isAnswered }}}
+				<span class="badge text-bg-success d-inline-flex align-items-center gap-1" title="Answered by {./answeredBy} ({./answeredByRole})">
+						<i class="fa fa-check-circle"></i>
+						<span>Answered</span>
+				</span>
+				{{{ end }}}
 				{{{ if showSelect }}}
 				<div class="checkbox position-absolute top-0 end-0 m-0 d-flex d-lg-none" style="max-width:max-content">
 					<i component="topic/select" class="fa fa-square-o text-muted pointer p-1"></i>

@@ -20,15 +20,6 @@
 		<a class="topic-title fw-semibold fs-5 text-reset text-break" href="{config.relative_path}/post/{encodeURIComponent(./pid)}">
 			{{{ if !./isMainPost }}}RE: {{{ end }}}{./topic.title}
 		</a>
-		<div class="d-flex flex-wrap gap-1 align-items-center mb-1">
-			{{{ if !./topic.isAnswered }}}
-			<span class="badge text-bg-danger"><i class="fa fa-question-circle"></i> [[search:unanswered]]</span>
-			<span class="badge border border-gray-300 text-muted text-sm"><span class="text-muted">[[topic:posted]]</span> <span class="timeago" title="{./topic.timestampISO}"></span></span>
-			{{{ end }}}
-			{{{ if ./topic.isAnswered }}}
-			<span class="badge text-bg-success"><i class="fa fa-check-circle></i> [[search:answered]]</span>
-			{{{ end }}}
-		</div>
 		<div class="post-body d-flex flex-column gap-1">
 			<div class="d-flex gap-3 post-info">
 				<div class="post-author d-flex gap-1">

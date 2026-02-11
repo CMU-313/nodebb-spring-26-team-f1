@@ -48,17 +48,6 @@
 						<i class="fa fa-arrow-circle-right"></i>
 						<span>[[topic:moved]]</span>
 					</span>
-					<span component="topic/resolution-unanswered" class="badge text-bg-danger {{{ if ./isAnswered }}}hidden{{{ end }}}">
-						<i class="fa fa-question-circle"></i>
-						<span>[[search:unanswered]]</span>
-					</span>
-					<span component="topic/resolution-answered" class="badge text-bg-success {{{ if !./isAnswered }}}hidden{{{ end }}}">
-						<i class="fa fa-check-circle"></i>
-						<span>[[search:answered]]</span>
-					</span>
-					{{{ if !./isAnswered }}}
-					<span class="badge border border-gray-300 text-body text-muted"><span class="text-muted text-xs">[[topic:posted]]</span> <span class="timeago" title="{./timestampISO}"></span></span>
-					{{{ end }}}
 					{{{each ./icons}}}<span class="lh-1">{@value}</span>{{{end}}}
 
 					{{{ if (!template.category || (cid != ./cid)) }}}
