@@ -47,6 +47,7 @@ exports.post = async function (req, res) {
 		timestamp: Date.now(),
 		content: body.content,
 		handle: body.handle,
+		isAnonymous: body.isAnonymous ? 1 : 0,
 		fromQueue: false,
 	};
 	req.body.noscript = 'true';

@@ -22,6 +22,17 @@ module.exports = function (Topics) {
 			teaserPost = options.teaserPost || meta.config.teaserPost;
 		}
 
+		const tidToTopic = _.zipObject(
+			topics.filter(Boolean).map(topic => topic.tid),
+			topics.filter(Boolean)
+		);
+		const cids = _.uniq(topics.map(topic => topic && topic.cid).filter(Boolean));
+		const [isAdmin, isModerator] = await Promise.all([
+			user.isAdministrator(uid),
+			cids.length ? user.isModerator(uid, cids) : [],
+		]);
+		const isModeratorByCid = _.zipObject(cids, isModerator);
+
 		const counts = [];
 		const teaserPids = [];
 		const tidToPost = {};
@@ -43,7 +54,7 @@ module.exports = function (Topics) {
 		});
 
 		const [allPostData, callerSettings] = await Promise.all([
-			posts.getPostsFields(teaserPids, ['pid', 'uid', 'timestamp', 'tid', 'content', 'sourceContent']),
+			posts.getPostsFields(teaserPids, ['pid', 'uid', 'timestamp', 'tid', 'content', 'sourceContent', 'isAnonymous']),
 			user.getSettings(uid),
 		]);
 		let postData = allPostData.filter(post => post && post.pid);
@@ -66,6 +77,13 @@ module.exports = function (Topics) {
 
 			post.user = users[post.uid];
 			post.timestampISO = utils.toISOString(post.timestamp);
+			const topic = tidToTopic[post.tid];
+			const viewerIsPrivileged = isAdmin || (topic && isModeratorByCid[topic.cid]);
+			if (post.isAnonymous && !viewerIsPrivileged) {
+				Topics.maskAnonymousPostUser(post);
+			} else if (post.isAnonymous && viewerIsPrivileged) {
+				post.isAnonymousToInstructor = true;
+			}
 			tidToPost[post.tid] = post;
 		});
 		await Promise.all(postData.map(p => posts.parsePost(p, 'plaintext')));

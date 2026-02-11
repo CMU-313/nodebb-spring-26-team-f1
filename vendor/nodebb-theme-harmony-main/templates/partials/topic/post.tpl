@@ -52,6 +52,14 @@
 				{{{ end }}}
 				{{{ end }}}
 
+				{{{ if posts.isAnonymous }}}
+				<span class="badge bg-secondary rounded-1" title="This post was made anonymously"><i class="fa fa-user-secret"></i> Anonymous</span>
+				{{{ end }}}
+
+				{{{ if posts.isAnonymousToInstructor }}}
+				<span class="badge bg-warning text-dark rounded-1" title="Posted anonymously - only visible to instructors"><i class="fa fa-eye"></i> Anonymous post</span>
+				{{{ end }}}
+
 				{{{ if posts.user.banned }}}
 				<span class="badge bg-danger rounded-1">[[user:banned]]</span>
 				{{{ end }}}

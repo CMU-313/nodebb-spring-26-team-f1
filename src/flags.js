@@ -42,7 +42,7 @@ Flags._states = new Map([
 
 Flags.init = async function () {
 	// Query plugins for custom filter strategies and merge into core filter strategies
-	function prepareSets(sets, orSets, prefix, value) {
+	function prepareSets({set1:sets,set2: orSets}, prefix, value) {
 		if (!Array.isArray(value)) {
 			sets.push(prefix + value);
 		} else if (value.length) {
@@ -53,26 +53,25 @@ Flags.init = async function () {
 			}
 		}
 	}
-
 	const hookData = {
 		filters: {
 			type: function (sets, orSets, key) {
-				prepareSets(sets, orSets, 'flags:byType:', key);
+				prepareSets({set1:sets, set2:orSets}, 'flags:byType:', key);
 			},
 			state: function (sets, orSets, key) {
-				prepareSets(sets, orSets, 'flags:byState:', key);
+				prepareSets({set1:sets, set2:orSets}, 'flags:byState:', key);
 			},
 			reporterId: function (sets, orSets, key) {
-				prepareSets(sets, orSets, 'flags:byReporter:', key);
+				prepareSets({set1:sets, set2:orSets}, 'flags:byReporter:', key);
 			},
 			assignee: function (sets, orSets, key) {
-				prepareSets(sets, orSets, 'flags:byAssignee:', key);
+				prepareSets({set1:sets, set2:orSets}, 'flags:byAssignee:', key);
 			},
 			targetUid: function (sets, orSets, key) {
-				prepareSets(sets, orSets, 'flags:byTargetUid:', key);
+				prepareSets({set1:sets, set2:orSets}, 'flags:byTargetUid:', key);
 			},
 			cid: function (sets, orSets, key) {
-				prepareSets(sets, orSets, 'flags:byCid:', key);
+				prepareSets({set1:sets, set2:orSets}, 'flags:byCid:', key);
 			},
 			page: function () { /* noop */ },
 			perPage: function () { /* noop */ },
@@ -83,7 +82,7 @@ Flags.init = async function () {
 						break;
 
 					case 'unresolved':
-						prepareSets(sets, orSets, 'flags:byState:', ['open', 'wip']);
+						prepareSets({set1:sets, set2:orSets}, 'flags:byState:', ['open', 'wip']);
 						break;
 				}
 			},
