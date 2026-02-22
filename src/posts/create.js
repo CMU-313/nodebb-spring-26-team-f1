@@ -10,6 +10,9 @@ const groups = require('../groups');
 const activitypub = require('../activitypub');
 const utils = require('../utils');
 
+
+const sockets = require('../socket.io'); 
+
 module.exports = function (Posts) {
 	Posts.create = async function (data) {
 		// This is an internal method, consider using Topics.reply instead
@@ -93,6 +96,27 @@ module.exports = function (Posts) {
 		const result = await plugins.hooks.fire('filter:post.get', { post: postData, uid: data.uid });
 		result.post.isMain = isMain;
 		plugins.hooks.fire('action:post.save', { post: { ...result.post, _activitypub } });
+
+		if (isMain || !sockets.server) {
+			return;
+		}
+		try {
+			// topic title
+			const topicTitle = await topics.getTopicField(tid, 'title');
+			// who should receive the notification
+			const targetUid = postData.toPid ? await Posts.getPostField(postData.toPid, 'uid') : await topics.getTopicField(tid, 'uid');
+			if (Number(targetUid) === Number(uid)) {
+				return;
+			}
+			sockets.server.to(`uid_${targetUid}`).emit('event:alert', {
+				title: 'Reply!',
+				message: `There is a reply in: ${topicTitle}`,
+				type: 'info',
+				timeout: 5000,
+			});
+		} catch (error) {
+			console.error('[posts/create] notification failed:', error);
+		}
 		return result.post;
 	};
 
