@@ -96,29 +96,33 @@ module.exports = function (Posts) {
 		const result = await plugins.hooks.fire('filter:post.get', { post: postData, uid: data.uid });
 		result.post.isMain = isMain;
 		plugins.hooks.fire('action:post.save', { post: { ...result.post, _activitypub } });
-
-		if (isMain || !sockets.server) {
-			return;
-		}
 		try {
-			// topic title
 			const topicTitle = await topics.getTopicField(tid, 'title');
-			// who should receive the notification
-			const targetUid = postData.toPid ? await Posts.getPostField(postData.toPid, 'uid') : await topics.getTopicField(tid, 'uid');
-			if (Number(targetUid) === Number(uid)) {
-				return;
-			}
-			sockets.server.to(`uid_${targetUid}`).emit('event:alert', {
-				title: 'Reply!',
-				message: `There is a reply in: ${topicTitle}`,
-				type: 'info',
-				timeout: 5000,
-			});
+			const targetUid = await getNotificationTarget(tid, postData);
+			if (Number(targetUid) === Number(uid)) return;
+			sendReplyNotification(targetUid, topicTitle);
+
 		} catch (error) {
-			console.error('[posts/create] notification failed:', error);
+			console.error('notification failed:', error);
 		}
 		return result.post;
 	};
+
+	async function getNotificationTarget(tid, postData) {
+		if (postData.toPid) {
+			return Posts.getPostField(postData.toPid, 'uid');
+		}
+		return topics.getTopicField(tid, 'uid');
+	}
+
+	function sendReplyNotification(targetUid, topicTitle) {
+		sockets.server.to(`uid_${targetUid}`).emit('event:alert', {
+			title: 'Reply!',
+			message: `There is a reply in: ${topicTitle}`,
+			type: 'info',
+			timeout: 5000,
+		});
+	}
 
 	async function addReplyTo(postData, timestamp) {
 		if (!postData.toPid) {
