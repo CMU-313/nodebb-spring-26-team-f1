@@ -100,7 +100,8 @@ module.exports = function (Posts) {
 			const topicTitle = await topics.getTopicField(tid, 'title');
 			const targetUid = await getNotificationTarget(tid, postData);
 			if (Number(targetUid) === Number(uid)) return;
-			sendReplyNotification(targetUid, topicTitle);
+			const postExcerpt = postData.content;
+			sendReplyNotification(targetUid, topicTitle, tid, postData.pid, uid, postExcerpt);
 
 		} catch (error) {
 			console.error('notification failed:', error);
@@ -115,12 +116,17 @@ module.exports = function (Posts) {
 		return topics.getTopicField(tid, 'uid');
 	}
 
-	function sendReplyNotification(targetUid, topicTitle) {
+	function sendReplyNotification(targetUid, topicTitle, tid, pid, fromUid, excerpt) {
 		sockets.server.to(`uid_${targetUid}`).emit('event:alert', {
 			title: 'Reply!',
 			message: `There is a reply in: ${topicTitle}`,
+			topicId: tid,
+			postId: pid,
+			fromUid: fromUid,
+			excerpt: excerpt ? excerpt.slice(0, 50) + '...' : '',
 			type: 'info',
 			timeout: 5000,
+			icon: '/assets/reply-icon.png',
 		});
 	}
 
