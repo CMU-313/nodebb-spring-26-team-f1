@@ -96,15 +96,29 @@ module.exports = function (Posts) {
 		const result = await plugins.hooks.fire('filter:post.get', { post: postData, uid: data.uid });
 		result.post.isMain = isMain;
 		plugins.hooks.fire('action:post.save', { post: { ...result.post, _activitypub } });
-		try {
-			const topicTitle = await topics.getTopicField(tid, 'title');
-			const targetUid = await getNotificationTarget(tid, postData);
-			if (Number(targetUid) === Number(uid)) return;
-			const postExcerpt = postData.content;
-			sendReplyNotification(targetUid, topicTitle, tid, postData.pid, uid, postExcerpt);
+		if (!isMain && sockets.server) {
+			try {
+				const [topicTitle, targetUid] = await Promise.all([
+					topics.getTopicField(tid, 'title'),
+					getNotificationTarget(tid, postData),
+				]);
 
-		} catch (error) {
-			console.error('notification failed:', error);
+				// Only notify if the replier is not the target user
+				const isSelfReply = Number(targetUid) === Number(uid);
+				if (!isSelfReply) {
+					const excerpt = postData.content || '';
+					sendReplyNotification(
+						targetUid,
+						topicTitle,
+						tid,
+						result.post.pid,
+						uid,
+						excerpt
+					);
+				}
+			} catch (error) {
+				console.error('notification failed:', error);
+			}
 		}
 		return result.post;
 	};

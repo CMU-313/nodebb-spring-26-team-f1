@@ -387,6 +387,42 @@ describe('Notifications', () => {
 		const data = await user.notifications.getAll(followerUid, '');
 		assert(data);
 	});
+	it('should send a reply notification to the correct user', async () => {
+		const replierUid = await user.create({ username: 'replier' });
+		const originalPosterUid = await user.create({ username: 'originalPoster' });
+
+		const { cid } = await categories.create({
+			name: 'Test Category Reply',
+			description: 'Category for testing reply notifications',
+		});
+
+		const { topicData } = await topics.post({
+			uid: originalPosterUid,
+			cid: cid,
+			title: 'Original Topic',
+			content: 'Original content',
+		});
+		const { tid } = topicData;
+
+		// Post a reply
+		const { pid } = await topics.reply({
+			uid: replierUid,
+			tid: tid,
+			content: 'This is a reply!',
+		});
+
+		// Wait a bit for async notifications to be pushed
+		await new Promise((resolve) => setTimeout(resolve, 2000));
+
+		// Fetch notifications for original poster
+		const notificationsList = await user.notifications.get(originalPosterUid);
+
+		assert(notificationsList.unread.length > 0, 'Original poster should have unread notifications');
+		assert(
+			notificationsList.unread.some(n => n.path.includes(`/post/${pid}`)),
+			'Notification should link to the reply post'
+		);
+	});
 
 	it('should send welcome notification', (done) => {
 		meta.config.welcomeNotification = 'welcome to the forums';
