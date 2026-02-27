@@ -104,7 +104,24 @@ module.exports = function (Categories) {
 		let normalTids;
 		if (Array.isArray(set)) {
 			const weights = set.map((s, index) => (index ? 0 : 1));
-			normalTids = await db.getSortedSetRevIntersect({ sets: set, start: start, stop: stop, weights: weights });
+
+			if (data.sort === 'oldest_created') {
+				normalTids = await db.getSortedSetIntersect({
+					sets: set,
+					start: start,
+					stop: stop,
+					weights: weights,
+				});
+			} else {
+				normalTids = await db.getSortedSetRevIntersect({
+					sets: set,
+					start: start,
+					stop: stop,
+					weights: weights,
+				});
+			}
+		} else if (data.sort === 'oldest_created') {
+			normalTids = await db.getSortedSetRange(set, start, stop);
 		} else {
 			normalTids = await db.getSortedSetRevRange(set, start, stop);
 		}
@@ -135,6 +152,7 @@ module.exports = function (Categories) {
 		const sortToSet = {
 			recently_replied: `cid:${cid}:tids`,
 			recently_created: `cid:${cid}:tids:create`,
+			oldest_created: `cid:${cid}:tids:create`,
 			most_posts: `cid:${cid}:tids:posts`,
 			most_votes: `cid:${cid}:tids:votes`,
 			most_views: `cid:${cid}:tids:views`,
@@ -304,13 +322,15 @@ module.exports = function (Categories) {
 			const sortToSet = {
 				recently_replied: `cid:${cid}:tids`,
 				recently_created: `cid:${cid}:tids:create`,
+				oldest_created: `cid:${cid}:tids:create`,
 				most_posts: `cid:${cid}:tids:posts`,
 				most_votes: `cid:${cid}:tids:votes`,
 				most_views: `cid:${cid}:tids:views`,
 			};
-
+		
 			return sortToSet[sort];
 		}
+		
 
 		const scores = await Promise.all(tids.map(async (tid, idx) => {
 			const cid = cids[idx];
@@ -320,7 +340,12 @@ module.exports = function (Categories) {
 
 		const sorted = tids
 			.map((tid, idx) => [tid, scores[idx]])
-			.sort(([, a], [, b]) => b - a)
+			.sort(([, a], [, b]) => {
+				if (sort === 'oldest_created') {
+					return a - b; // oldest first
+				}
+				return b - a; // newest / highest first
+			})
 			.map(([tid]) => tid);
 
 		return sorted;

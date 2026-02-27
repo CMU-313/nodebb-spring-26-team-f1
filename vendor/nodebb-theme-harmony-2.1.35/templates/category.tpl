@@ -53,6 +53,13 @@
 		<a href="?answered=false" role="button" class="btn btn-outline-secondary filter-tab" data-resolved="false">
 			<i class="fa fa-question-circle text-danger"></i> Unanswered
 		</a>
+		<a href="?answered=false&sort=oldest_created"
+		   role="button"
+		   class="btn btn-outline-secondary filter-tab"
+		   data-resolved="false"
+		   data-sort="oldest_created">
+			<i class="fa fa-hourglass-half text-warning"></i> [[topic:oldest-unanswered-questions]]
+		</a>
 		<a href="?answered=true" role="button" class="btn btn-outline-secondary filter-tab" data-resolved="true">
 			<i class="fa fa-check-circle text-success"></i> Answered
 		</a>
