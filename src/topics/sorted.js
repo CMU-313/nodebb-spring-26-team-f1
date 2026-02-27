@@ -183,7 +183,7 @@ module.exports = function (Topics) {
 		const { sortMap, fields } = await plugins.hooks.fire('filter:topics.sortOptions', {
 			params,
 			fields: [
-				'tid', 'timestamp', 'lastposttime', 'upvotes', 'downvotes', 'postcount', 'pinned',
+				'tid', 'timestamp', 'lastposttime', 'upvotes', 'downvotes', 'postcount', 'pinned', 'isOfficial',
 			],
 			sortMap: {
 				recent: sortRecent,
@@ -209,7 +209,14 @@ module.exports = function (Topics) {
 	}
 
 	function floatPinned(topicData, sortFn) {
-		topicData.sort((a, b) => (a.pinned !== b.pinned ? b.pinned - a.pinned : sortFn(a, b)));
+		topicData.sort((a, b) => {
+			// Pinned topics come first
+			if (a.pinned !== b.pinned) return b.pinned - a.pinned;
+			// Then official topics
+			if (a.isOfficial !== b.isOfficial) return b.isOfficial - a.isOfficial;
+			// Then apply the normal sort function
+			return sortFn(a, b);
+		});
 	}
 
 	function sortRecent(a, b) {

@@ -80,6 +80,16 @@ Topics.unpin = async (req, res) => {
 	helpers.formatApiResponse(200, res);
 };
 
+Topics.markOfficial = async (req, res) => {
+	await api.topics.markOfficial(req, { tids: [req.params.tid] });
+	helpers.formatApiResponse(200, res);
+};
+
+Topics.unmarkOfficial = async (req, res) => {
+	await api.topics.unmarkOfficial(req, { tids: [req.params.tid] });
+	helpers.formatApiResponse(200, res);
+};
+
 Topics.lock = async (req, res) => {
 	await api.topics.lock(req, { tids: [req.params.tid] });
 	helpers.formatApiResponse(200, res);
