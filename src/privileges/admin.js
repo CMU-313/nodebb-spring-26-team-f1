@@ -58,6 +58,7 @@ privsAdmin.routeMap = {
 	'manage/users': 'admin:users',
 	'manage/groups': 'admin:groups',
 	'manage/tags': 'admin:tags',
+	'manage/assignment-tags': 'admin:tags',
 	'settings/tags': 'admin:tags',
 	'extend/plugins': 'admin:settings',
 	'extend/widgets': 'admin:settings',
