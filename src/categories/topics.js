@@ -43,9 +43,7 @@ module.exports = function (Categories) {
 			const filteredPidSet = new Set(filteredPids.map(pid => String(pid)));
 
 			// Filter topics to only include those with matching main posts
-			return topicsData.filter((topic, index) =>
-				filteredPidSet.has(String(mainPids[index]))
-			);
+			return topicsData.filter((topic, index) => filteredPidSet.has(String(mainPids[index])));
 		} catch (err) {
 			// If assignment tags are not available (e.g., MongoDB), return all topics
 			if (err.message === '[[error:assignment-tags-postgres-only]]') {

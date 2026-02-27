@@ -87,19 +87,6 @@ function modifyPost(post, fields) {
 	}
 }
 
-async function addAssignmentTagsToPost(post) {
-	if (!post || !post.pid) {
-		return;
-	}
-	try {
-		const assignmentTags = require('../assignment-tags');
-		post.assignmentTags = await assignmentTags.getPostTags(post.pid);
-	} catch (err) {
-		// Silently fail if assignment tags are not available (e.g., MongoDB)
-		post.assignmentTags = [];
-	}
-}
-
 async function addAssignmentTagsToPostsBulk(posts) {
 	if (!posts || !posts.length) {
 		return;

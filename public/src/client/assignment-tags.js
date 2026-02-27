@@ -203,15 +203,14 @@ define('forum/assignment-tags', ['hooks', 'api', 'alerts'], function (hooks, api
 			$('body').append(modalHtml);
 
 			var $modal = $('#editAssignmentTagsModal');
-			var modal = new bootstrap.Modal($modal[0]);
-			modal.show();
+			$modal.modal('show');
 
 			$modal.find('.save-tags-btn').on('click', function () {
 				var selected = $modal.find('.edit-tags-select').val() || [];
 				var tagIds = selected.map(function (id) { return parseInt(id, 10); });
 
 				api.put('/assignment-tags/posts/' + pid, { tagIds: tagIds }).then(function () {
-					modal.hide();
+					$modal.modal('hide');
 					// Refresh tag chips on the post
 					var chipsHtml = '';
 					if (tagIds.length) {

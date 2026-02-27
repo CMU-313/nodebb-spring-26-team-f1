@@ -6,7 +6,6 @@ define('admin/manage/assignment-tags', [
 	'alerts',
 ], function (api, bootbox, alerts) {
 	const AssignmentTags = {};
-	let currentEditingId = null;
 
 	AssignmentTags.init = function () {
 		handleCreateTag();
@@ -17,7 +16,6 @@ define('admin/manage/assignment-tags', [
 
 	function handleCreateTag() {
 		$('#create-tag').on('click', function () {
-			currentEditingId = null;
 			$('#tag-modal .modal-title').text('Create Assignment Tag');
 			$('#tag-form')[0].reset();
 			$('#tag-id').val('');
@@ -30,7 +28,6 @@ define('admin/manage/assignment-tags', [
 	function handleEditTag() {
 		$(document).on('click', '.edit-tag', function () {
 			const tagId = $(this).data('id');
-			currentEditingId = tagId;
 
 			// Fetch tag data
 			api.get(`/assignment-tags/${tagId}`, {}).then((tag) => {
@@ -126,7 +123,6 @@ define('admin/manage/assignment-tags', [
 		// Handle modal hide
 		$('#tag-modal').on('hidden.bs.modal', function () {
 			$('#tag-form')[0].reset();
-			currentEditingId = null;
 		});
 	}
 

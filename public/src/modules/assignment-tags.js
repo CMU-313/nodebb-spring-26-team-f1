@@ -1,6 +1,6 @@
 'use strict';
 
-define('modules/assignment-tags', ['api', 'alerts'], function (api, alerts) {
+define('modules/assignment-tags', ['api'], function (api) {
 	const AssignmentTags = {};
 	let availableTags = [];
 
