@@ -88,7 +88,7 @@ module.exports = function (Posts) {
 			Posts.uploads.sync(pid),
 			hasAttachment ? Posts.attachments.update(pid, _activitypub.attachment) : null,
 			topics.autoResolveIfNeeded(tid, uid, topicData.cid),
-			addAssignmentTags(postData.pid, data.tags),
+			addAssignmentTags(postData.pid, data.assignmentTags),
 		]);
 
 		const result = await plugins.hooks.fire('filter:post.get', { post: postData, uid: data.uid });
