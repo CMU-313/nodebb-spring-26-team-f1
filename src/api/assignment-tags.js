@@ -195,3 +195,23 @@ assignmentTagsAPI.getTagPosts = async function (caller, data) {
 
 	return await assignmentTags.getTagPosts(data.id);
 };
+
+/**
+ * Filter posts by tags
+ * GET /api/v3/posts?tags=1,2,3
+ */
+assignmentTagsAPI.filterPosts = async function (caller, data) {
+	if (parseInt(caller.uid, 10) <= 0) {
+		throw new Error('[[error:not-logged-in]]');
+	}
+
+	if (!data.pids || !Array.isArray(data.pids)) {
+		throw new Error('[[error:invalid-data]]');
+	}
+
+	if (!data.tags || !Array.isArray(data.tags)) {
+		return data.pids;
+	}
+
+	return await assignmentTags.filterPostsByTags(data.pids, data.tags);
+};

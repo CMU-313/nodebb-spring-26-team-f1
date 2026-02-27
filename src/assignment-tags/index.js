@@ -237,3 +237,29 @@ AssignmentTags.setPostTags = async function (postId, tagIds) {
 		client.release();
 	}
 };
+
+/**
+ * Filter posts by assignment tags
+ * @param {Array<number>} pids - Array of post IDs to filter
+ * @param {Array<number>} tagIds - Array of tag IDs to filter by (OR operation)
+ * @returns {Promise<Array<number>>} - Filtered post IDs
+ */
+AssignmentTags.filterPostsByTags = async function (pids, tagIds) {
+	if (nconf.get('database') !== 'postgres') {
+		return pids; // Return all pids if not using PostgreSQL
+	}
+
+	if (!Array.isArray(pids) || !pids.length || !Array.isArray(tagIds) || !tagIds.length) {
+		return pids;
+	}
+
+	const placeholders = tagIds.map((_, i) => `$${i + 1}`).join(', ');
+	const result = await db.pool.query(
+		`SELECT DISTINCT post_id FROM post_tags
+		 WHERE tag_id IN (${placeholders})
+		 AND post_id = ANY($${tagIds.length + 1})`,
+		[...tagIds, pids]
+	);
+
+	return result.rows.map(row => row.post_id);
+};

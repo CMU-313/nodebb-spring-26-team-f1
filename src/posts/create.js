@@ -88,6 +88,7 @@ module.exports = function (Posts) {
 			Posts.uploads.sync(pid),
 			hasAttachment ? Posts.attachments.update(pid, _activitypub.attachment) : null,
 			topics.autoResolveIfNeeded(tid, uid, topicData.cid),
+			addAssignmentTags(postData.pid, data.tags),
 		]);
 
 		const result = await plugins.hooks.fire('filter:post.get', { post: postData, uid: data.uid });
@@ -104,5 +105,20 @@ module.exports = function (Posts) {
 			db.sortedSetAdd(`pid:${postData.toPid}:replies`, timestamp, postData.pid),
 			db.incrObjectField(`post:${postData.toPid}`, 'replies'),
 		]);
+	}
+
+	async function addAssignmentTags(pid, tags) {
+		if (!tags || !Array.isArray(tags) || tags.length === 0) {
+			return;
+		}
+		const assignmentTags = require('../assignment-tags');
+		try {
+			await assignmentTags.setPostTags(pid, tags);
+		} catch (err) {
+			// Silently fail if assignment tags are not available (e.g., MongoDB)
+			if (err.message !== '[[error:assignment-tags-postgres-only]]') {
+				throw err;
+			}
+		}
 	}
 };
