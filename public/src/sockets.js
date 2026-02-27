@@ -105,13 +105,7 @@ app = window.app || {};
 			require(['logout'], function (logout) {
 				logout();
 			});
-		});
-		// socket.on('event:alert', function (params) {
-		// 	require(['alerts'], function (alerts) {
-		// 		alerts.alert(params);
-		// 	});
-		// });
-
+		}); 
 		socket.on('event:alert', function (params) {
 			const content = params.excerpt ? `${params.message}\n"${params.excerpt}"` : params.message;
 			alert({
