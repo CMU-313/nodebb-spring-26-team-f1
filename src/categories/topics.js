@@ -55,6 +55,28 @@ module.exports = function (Categories) {
 		}
 	}
 
+	async function addAssignmentTagsToTopics(topicsData) {
+		if (!topicsData || !topicsData.length) {
+			return;
+		}
+		try {
+			const assignmentTags = require('../assignment-tags');
+			const mainPids = await Promise.all(
+				topicsData.map(topic => topics.getTopicField(topic.tid, 'mainPid'))
+			);
+			const tagArrays = await Promise.all(
+				mainPids.map(pid => (pid ? assignmentTags.getPostTags(pid).catch(() => []) : Promise.resolve([])))
+			);
+			topicsData.forEach((topic, i) => {
+				topic.assignmentTags = tagArrays[i] || [];
+			});
+		} catch (err) {
+			topicsData.forEach((topic) => {
+				topic.assignmentTags = [];
+			});
+		}
+	}
+
 	Categories.getCategoryTopics = async function (data) {
 		if (data) {
 			if (typeof data.resolved === 'string') {
@@ -110,6 +132,9 @@ module.exports = function (Categories) {
 			return { topics: [], uid: data.uid };
 		}
 		topics.calculateTopicIndices(topicsData, data.start);
+
+		// Attach assignment tags to each topic (from main post)
+		await addAssignmentTagsToTopics(topicsData);
 
 		results = await plugins.hooks.fire('filter:category.topics.get', { cid: data.cid, topics: topicsData, uid: data.uid });
 		return { topics: results.topics, nextStart: data.stop + 1 };

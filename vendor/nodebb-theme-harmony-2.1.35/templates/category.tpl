@@ -46,16 +46,41 @@
 {{{ end }}}
 
 <div class="topic-list-filters mb-3" id="topic-filters">
-    <div class="btn-group btn-group-sm" role="group">
-		<a href="?answered=" role="button" class="btn btn-outline-secondary filter-tab active" data-resolved="">
-			<i class="fa fa-list"></i> All Questions
-		</a>
-		<a href="?answered=false" role="button" class="btn btn-outline-secondary filter-tab" data-resolved="false">
-			<i class="fa fa-question-circle text-danger"></i> Unanswered
-		</a>
-		<a href="?answered=true" role="button" class="btn btn-outline-secondary filter-tab" data-resolved="true">
-			<i class="fa fa-check-circle text-success"></i> Answered
-		</a>
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        <div class="btn-group btn-group-sm" role="group">
+            <a href="?answered=" role="button" class="btn btn-outline-secondary filter-tab active" data-resolved="">
+                <i class="fa fa-list"></i> All Questions
+            </a>
+            <a href="?answered=false" role="button" class="btn btn-outline-secondary filter-tab" data-resolved="false">
+                <i class="fa fa-question-circle text-danger"></i> Unanswered
+            </a>
+            <a href="?answered=true" role="button" class="btn btn-outline-secondary filter-tab" data-resolved="true">
+                <i class="fa fa-check-circle text-success"></i> Answered
+            </a>
+        </div>
+        {{{ if assignmentTags.length }}}
+        <div class="btn-group btn-group-sm" role="group" component="assignment-tags/filter">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="assignment-tags-filter-btn">
+                <i class="fa fa-tag"></i> <span id="assignment-tags-filter-label">Filter by tag...</span>
+            </button>
+            <ul class="dropdown-menu" id="assignment-tags-filter-menu">
+                {{{ each assignmentTags }}}
+                <li>
+                    <a class="dropdown-item assignment-tag-filter-item d-flex align-items-center gap-2" href="#" data-tag-id="{assignmentTags.id}">
+                        <span class="badge rounded-pill" style="background-color: {assignmentTags.color}; color: #fff;">&nbsp;</span>
+                        <span>{assignmentTags.name}</span>
+                    </a>
+                </li>
+                {{{ end }}}
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item text-muted" href="#" id="assignment-tags-clear">
+                        <i class="fa fa-times"></i> Clear filter
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {{{ end }}}
     </div>
 </div>
 

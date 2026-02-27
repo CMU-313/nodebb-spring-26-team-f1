@@ -1,229 +1,116 @@
 'use strict';
 
-define('forum/assignment-tags', ['api', 'hooks'], function (api, hooks) {
+define('forum/assignment-tags', ['hooks', 'api'], function (hooks, api) {
 	const AssignmentTags = {};
 
 	AssignmentTags.init = function () {
-		displayTagsOnPosts();
 		setupTagClickHandlers();
 		setupFilterDropdown();
+		setupComposerIntegration();
 	};
 
-	function displayTagsOnPosts() {
-		// Wait for posts to be loaded
-		$(window).on('action:posts.loaded action:topics.loaded', function (ev, data) {
-			if (!data || !data.posts) {
-				return;
-			}
-
-			data.posts.forEach(function (post) {
-				if (post.assignmentTags && post.assignmentTags.length > 0) {
-					renderTagsOnPost(post.pid, post.assignmentTags);
-				}
-			});
-		});
-
-		// Also handle already loaded posts on page load
-		setTimeout(function () {
-			$('[component="post"]').each(function () {
-				const pid = $(this).attr('data-pid');
-				const postData = $(this).data('post');
-
-				if (postData && postData.assignmentTags && postData.assignmentTags.length > 0) {
-					renderTagsOnPost(pid, postData.assignmentTags);
-				}
-			});
-		}, 100);
-	}
-
-	function renderTagsOnPost(pid, tags) {
-		const postElement = $('[component="post"][data-pid="' + pid + '"]');
-
-		// Avoid duplicate rendering
-		if (postElement.find('.assignment-tags-display').length > 0) {
-			return;
-		}
-
-		const tagsHtml = tags.map(function (tag) {
-			return `
-				<a href="#" class="assignment-tag-chip badge rounded-pill me-1 text-decoration-none"
-				   data-tag-id="${tag.id}"
-				   style="background-color: ${tag.color}; color: white; cursor: pointer;"
-				   title="Filter by ${tag.name}">
-					<i class="fa fa-tag"></i> ${tag.name}
-				</a>
-			`;
-		}).join('');
-
-		const tagsContainer = `
-			<div class="assignment-tags-display mt-2 mb-2">
-				${tagsHtml}
-			</div>
-		`;
-
-		// Insert tags after post content
-		const contentEl = postElement.find('[component="post/content"]');
-		if (contentEl.length) {
-			contentEl.after(tagsContainer);
-		}
-	}
-
+	// Click handler for tag chips — navigates to filtered category view
 	function setupTagClickHandlers() {
-		$(document).on('click', '.assignment-tag-chip', function (e) {
+		$(document).off('click.assignmentTags').on('click.assignmentTags', '.assignment-tag-chip', function (e) {
 			e.preventDefault();
 			e.stopPropagation();
-
-			const tagId = $(this).data('tag-id');
-			const tagName = $(this).text().trim();
-
-			// Navigate to category with tag filter
-			const currentPath = window.location.pathname;
-			const categoryMatch = currentPath.match(/^\/category\/(\d+)/);
-
-			if (categoryMatch) {
-				const cid = categoryMatch[1];
-				// Add tag filter to current category
-				window.location.href = `/category/${cid}?assignmentTags=${tagId}`;
+			var tagId = $(this).attr('data-tag-id');
+			if (!tagId) {
+				return;
+			}
+			var cid = ajaxify.data.cid;
+			if (cid) {
+				ajaxify.go('category/' + cid + '?assignmentTags=' + tagId);
 			} else {
-				// Go to recent topics with tag filter
-				window.location.href = `/recent?assignmentTags=${tagId}`;
+				var url = new URL(window.location.href);
+				url.searchParams.set('assignmentTags', tagId);
+				ajaxify.go(url.pathname.replace(config.relative_path, '').replace(/^\//, '') + '?' + url.searchParams.toString());
 			}
 		});
 	}
 
+	// Filter dropdown on category pages
 	function setupFilterDropdown() {
-		// Only set up on category and topic list pages
-		const isCategoryPage = $('[component="category"]').length > 0;
-		const isTopicListPage = $('[component="category/topic"]').length > 0 || $('.topic-list').length > 0;
+		var $menu = $('#assignment-tags-filter-menu');
+		var $btn = $('#assignment-tags-filter-btn');
+		var $label = $('#assignment-tags-filter-label');
+		var $clear = $('#assignment-tags-clear');
 
-		if (!isCategoryPage && !isTopicListPage) {
+		if (!$menu.length) {
 			return;
 		}
 
-		// Load available tags
-		api.get('/assignment-tags', {}).then(function (tags) {
-			if (!tags || tags.length === 0) {
+		// Highlight active filter from URL
+		var params = new URLSearchParams(window.location.search);
+		var activeTagId = params.get('assignmentTags');
+		if (activeTagId) {
+			var $activeItem = $menu.find('.assignment-tag-filter-item[data-tag-id="' + activeTagId + '"]');
+			if ($activeItem.length) {
+				$activeItem.addClass('active');
+				$label.text($activeItem.find('span:last').text());
+				$btn.removeClass('btn-outline-secondary').addClass('btn-primary');
+			}
+		}
+
+		// Click a tag item to filter
+		$menu.off('click.assignmentTags', '.assignment-tag-filter-item').on('click.assignmentTags', '.assignment-tag-filter-item', function (e) {
+			e.preventDefault();
+			var tagId = $(this).attr('data-tag-id');
+			if (!tagId) {
+				return;
+			}
+			var cid = ajaxify.data.cid;
+			if (cid) {
+				ajaxify.go('category/' + cid + '?assignmentTags=' + tagId);
+			}
+		});
+
+		// Clear filter
+		$clear.off('click').on('click', function (e) {
+			e.preventDefault();
+			var cid = ajaxify.data.cid;
+			if (cid) {
+				ajaxify.go('category/' + cid);
+			} else {
+				ajaxify.go(window.location.pathname.replace(config.relative_path, '').replace(/^\//, ''));
+			}
+		});
+	}
+
+	// Add tag selector to composer via hook
+	function setupComposerIntegration() {
+		hooks.on('action:composer.enhance', function (data) {
+			var container = data.container;
+			if (!container || !container.length) {
+				return;
+			}
+			var tagRow = container.find('.tag-row');
+			if (!tagRow.length) {
+				return;
+			}
+			if (container.find('.assignment-tags-selector').length) {
 				return;
 			}
 
-			renderFilterDropdown(tags);
-			applyCurrentFilter();
-		}).catch(function (err) {
-			console.error('Failed to load assignment tags:', err);
+			api.get('/assignment-tags', {}).then(function (tags) {
+				if (!tags || !tags.length) {
+					return;
+				}
+				var options = tags.map(function (tag) {
+					return '<option value="' + tag.id + '">' + tag.name + '</option>';
+				}).join('');
+
+				var selectorHtml = '<div class="assignment-tags-selector d-flex align-items-center gap-2 mt-1">' +
+					'<label class="text-xs text-muted text-nowrap"><i class="fa fa-tag"></i> Assignment Tags:</label>' +
+					'<select class="form-select form-select-sm assignment-tags-select" multiple style="max-width: 300px;">' +
+					options +
+					'</select>' +
+					'</div>';
+				tagRow.append(selectorHtml);
+			}).catch(function () {
+				// Silently fail if tags not available
+			});
 		});
-	}
-
-	function renderFilterDropdown(tags) {
-		// Find a good place to insert the filter (after category header or topic controls)
-		const insertTarget = $('.topic-list-header, [component="category/controls"], .category-tools').first();
-
-		if (!insertTarget.length) {
-			return;
-		}
-
-		const currentTags = getSelectedTagsFromURL();
-
-		const filterHtml = `
-			<div class="assignment-tags-filter mb-3">
-				<div class="card">
-					<div class="card-body py-2">
-						<div class="row align-items-center">
-							<div class="col-auto">
-								<label class="form-label mb-0 fw-bold">
-									<i class="fa fa-filter"></i> Filter by Tags:
-								</label>
-							</div>
-							<div class="col">
-								<select id="assignment-tags-filter" class="form-select form-select-sm" multiple>
-									${tags.map(function (tag) {
-										const selected = currentTags.includes(String(tag.id)) ? 'selected' : '';
-										return `<option value="${tag.id}" ${selected} data-color="${tag.color}">
-											${tag.name}${tag.category ? ' (' + tag.category + ')' : ''}
-										</option>`;
-									}).join('')}
-								</select>
-								<small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
-							</div>
-							<div class="col-auto">
-								<button class="btn btn-primary btn-sm" id="apply-tag-filter">
-									<i class="fa fa-check"></i> Apply
-								</button>
-								<button class="btn btn-secondary btn-sm" id="clear-tag-filter">
-									<i class="fa fa-times"></i> Clear
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		`;
-
-		insertTarget.after(filterHtml);
-		setupFilterHandlers();
-	}
-
-	function setupFilterHandlers() {
-		$('#apply-tag-filter').on('click', function () {
-			const selectedTags = $('#assignment-tags-filter').val() || [];
-			applyTagFilter(selectedTags);
-		});
-
-		$('#clear-tag-filter').on('click', function () {
-			$('#assignment-tags-filter').val([]);
-			applyTagFilter([]);
-		});
-
-		// Allow Enter key to apply filter
-		$('#assignment-tags-filter').on('keypress', function (e) {
-			if (e.which === 13) {
-				$('#apply-tag-filter').click();
-			}
-		});
-	}
-
-	function applyTagFilter(tagIds) {
-		const url = new URL(window.location.href);
-
-		if (tagIds.length > 0) {
-			url.searchParams.set('assignmentTags', tagIds.join(','));
-		} else {
-			url.searchParams.delete('assignmentTags');
-		}
-
-		// Reload with new filter
-		window.location.href = url.toString();
-	}
-
-	function getSelectedTagsFromURL() {
-		const urlParams = new URLSearchParams(window.location.search);
-		const tagsParam = urlParams.get('assignmentTags') || urlParams.get('tags');
-
-		if (!tagsParam) {
-			return [];
-		}
-
-		return tagsParam.split(',').map(function (id) { return id.trim(); });
-	}
-
-	function applyCurrentFilter() {
-		const selectedTags = getSelectedTagsFromURL();
-
-		if (selectedTags.length > 0) {
-			// Show active filter indicator
-			showActiveFilterBadge(selectedTags);
-		}
-	}
-
-	function showActiveFilterBadge(tagIds) {
-		const badgeHtml = `
-			<div class="alert alert-info alert-dismissible fade show" role="alert">
-				<i class="fa fa-info-circle"></i>
-				<strong>Filtered by ${tagIds.length} tag(s)</strong>
-				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
-		`;
-
-		$('.assignment-tags-filter').prepend(badgeHtml);
 	}
 
 	return AssignmentTags;

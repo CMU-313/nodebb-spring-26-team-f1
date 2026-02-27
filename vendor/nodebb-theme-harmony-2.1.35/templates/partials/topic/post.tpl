@@ -84,6 +84,16 @@
 			{posts.content}
 		</div>
 
+		{{{ if posts.assignmentTags.length }}}
+		<div component="post/assignment-tags" class="d-flex flex-wrap gap-1 mt-2 mb-2">
+			{{{ each posts.assignmentTags }}}
+			<a href="#" class="assignment-tag-chip badge rounded-pill text-decoration-none" data-tag-id="{./id}" style="background-color: {./color}; color: #fff;">
+				<i class="fa fa-tag"></i> {./name}
+			</a>
+			{{{ end }}}
+		</div>
+		{{{ end }}}
+
 		<div component="post/footer" class="post-footer border-bottom pb-2">
 			{{{ if posts.user.signature }}}
 			<div component="post/signature" data-uid="{posts.user.uid}" class="text-xs text-muted mt-2">{posts.user.signature}</div>
