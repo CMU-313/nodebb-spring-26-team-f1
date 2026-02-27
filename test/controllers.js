@@ -1596,6 +1596,59 @@ describe('Controllers', () => {
 			assert.equal(body.topics[1].postcount, 1);
 		});
 
+		it('should sort topics by oldest_created (oldest first)', async () => {
+			const cat = await categories.create({ name: 'oldest-created-category' });
+			await topics.post({ uid: fooUid, cid: cat.cid, title: 'Oldest topic', content: 'first' });
+			await topics.post({ uid: fooUid, cid: cat.cid, title: 'Newer topic', content: 'second' });
+			await topics.post({ uid: fooUid, cid: cat.cid, title: 'Newest topic', content: 'third' });
+
+			const { response, body } = await request.get(`${nconf.get('url')}/api/category/${cat.slug}?sort=oldest_created`, { jar });
+			assert.equal(response.statusCode, 200);
+			assert.equal(body.topics.length, 3);
+			assert.equal(body.topics[0].title, 'Oldest topic');
+			assert.equal(body.topics[body.topics.length - 1].title, 'Newest topic');
+		});
+
+		it('should sort topics by recently_created (newest first)', async () => {
+			const cat = await categories.create({ name: 'recently-created-category' });
+			await topics.post({ uid: fooUid, cid: cat.cid, title: 'Oldest topic', content: 'first' });
+			await topics.post({ uid: fooUid, cid: cat.cid, title: 'Middle topic', content: 'second' });
+			await topics.post({ uid: fooUid, cid: cat.cid, title: 'Newest topic', content: 'third' });
+
+			const { response, body } = await request.get(`${nconf.get('url')}/api/category/${cat.slug}?sort=recently_created`, { jar });
+			assert.equal(response.statusCode, 200);
+			assert.equal(body.topics.length, 3);
+			assert.equal(body.topics[0].title, 'Newest topic');
+			assert.equal(body.topics[body.topics.length - 1].title, 'Oldest topic');
+		});
+
+		it('should filter to unanswered topics when answered=false', async () => {
+			const cat = await categories.create({ name: 'answered-filter-category' });
+			await topics.post({ uid: fooUid, cid: cat.cid, title: 'Unanswered topic', content: 'need help' });
+			const t2 = await topics.post({ uid: fooUid, cid: cat.cid, title: 'Answered topic', content: 'solved' });
+			await topics.setTopicField(t2.topicData.tid, 'isAnswered', 1);
+
+			const { response, body } = await request.get(`${nconf.get('url')}/api/category/${cat.slug}?answered=false`, { jar });
+			assert.equal(response.statusCode, 200);
+			const titles = body.topics.map(t => t.title);
+			assert(titles.includes('Unanswered topic'), 'should include unanswered topic');
+			assert(!titles.includes('Answered topic'), 'should not include answered topic');
+		});
+
+		it('should filter unanswered and sort by oldest_created (Oldest Unanswered)', async () => {
+			const cat = await categories.create({ name: 'oldest-unanswered-category' });
+			const t1 = await topics.post({ uid: fooUid, cid: cat.cid, title: 'Oldest unanswered', content: 'first' });
+			const t2 = await topics.post({ uid: fooUid, cid: cat.cid, title: 'Answered one', content: 'second' });
+			const t3 = await topics.post({ uid: fooUid, cid: cat.cid, title: 'Newer unanswered', content: 'third' });
+			await topics.setTopicField(t2.topicData.tid, 'isAnswered', 1);
+
+			const { response, body } = await request.get(`${nconf.get('url')}/api/category/${cat.slug}?answered=false&sort=oldest_created`, { jar });
+			assert.equal(response.statusCode, 200);
+			assert.equal(body.topics.length, 2, 'only unanswered topics');
+			assert.equal(body.topics[0].title, 'Oldest unanswered');
+			assert.equal(body.topics[1].title, 'Newer unanswered');
+		});
+
 		it('should load a specific users topics from a category with tags', async () => {
 			const category = await categories.create({ name: 'filtered-category' });
 			await topics.post({ uid: fooUid, cid: category.cid, title: 'topic 1', content: 'topic 1 OP', tags: ['java', 'cpp'] });
