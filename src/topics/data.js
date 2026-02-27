@@ -15,6 +15,7 @@ const intFields = [
 	'timestamp', 'upvotes', 'downvotes',
 	'lastposttime', 'deleterUid',
 	'isAnswered', 'isResolved', 'resolvedAt',
+	'isOfficial',
 ];
 
 module.exports = function (Topics) {

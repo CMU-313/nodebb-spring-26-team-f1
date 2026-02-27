@@ -201,6 +201,35 @@ module.exports = function (Topics) {
 		return topicData;
 	}
 
+	topicTools.markOfficial = async function (tid, uid) {
+		return await toggleOfficial(tid, uid, true);
+	};
+
+	topicTools.unmarkOfficial = async function (tid, uid) {
+		return await toggleOfficial(tid, uid, false);
+	};
+
+	async function toggleOfficial(tid, uid, official) {
+		const topicData = await Topics.getTopicData(tid);
+		if (!topicData) {
+			throw new Error('[[error:no-topic]]');
+		}
+
+		if (!await privileges.topics.isAdminOrMod(tid, uid)) {
+			throw new Error('[[error:no-privileges]]');
+		}
+
+		await Topics.setTopicField(tid, 'isOfficial', official ? 1 : 0);
+		const events = await Topics.events.log(tid, { type: official ? 'official' : 'unofficial', uid });
+
+		topicData.isOfficial = official;
+		topicData.events = events;
+
+		plugins.hooks.fire('action:topic.official', { topic: _.clone(topicData), uid });
+
+		return topicData;
+	}
+
 	topicTools.orderPinnedTopics = async function (uid, data) {
 		const { tid, order } = data;
 		const cid = await Topics.getTopicField(tid, 'cid');
