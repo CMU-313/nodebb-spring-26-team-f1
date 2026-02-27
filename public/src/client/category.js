@@ -1,10 +1,12 @@
 'use strict';
 
-define('forum/category', [], function () {
+define('forum/category', ['sort'], function (sort) {
 	var Category = {};
 
 	Category.init = function () {
 		initFilterTabs();
+
+		sort.handleSort('categoryTopicSort', 'category/' + ajaxify.data.slug);
 	};
 
 	function initFilterTabs() {
