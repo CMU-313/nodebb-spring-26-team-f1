@@ -15,12 +15,12 @@
 	<a component="topic/unpin" href="#" class="dropdown-item rounded-1 d-flex align-items-center gap-2 {{{ if !pinned }}}hidden{{{ end }}}" role="menuitem"><i class="fa fa-fw fa-thumb-tack fa-rotate-90 text-secondary"></i> [[topic:thread-tools.unpin]]</a>
 </li>
 
-<li {{{ if isOfficial }}}hidden{{{ end }}}>
-	<a component="topic/mark-official" href="#" class="dropdown-item rounded-1 d-flex align-items-center gap-2 {{{ if isOfficial }}}hidden{{{ end }}}" role="menuitem"><i class="fa fa-fw fa-bullhorn text-secondary"></i> [[topic:thread-tools.mark-official]]</a>
+<li {{{ if isImportant }}}hidden{{{ end }}}>
+	<a component="topic/mark-important" href="#" class="dropdown-item rounded-1 d-flex align-items-center gap-2 {{{ if isImportant }}}hidden{{{ end }}}" role="menuitem"><i class="fa fa-fw fa-bullhorn text-secondary"></i> [[topic:thread-tools.mark-important]]</a>
 </li>
 
-<li {{{ if !isOfficial }}}hidden{{{ end }}}>
-	<a component="topic/unmark-official" href="#" class="dropdown-item rounded-1 d-flex align-items-center gap-2 {{{ if !isOfficial }}}hidden{{{ end }}}" role="menuitem"><i class="fa fa-fw fa-bullhorn text-secondary"></i> [[topic:thread-tools.unmark-official]]</a>
+<li {{{ if !isImportant }}}hidden{{{ end }}}>
+	<a component="topic/unmark-important" href="#" class="dropdown-item rounded-1 d-flex align-items-center gap-2 {{{ if !isImportant }}}hidden{{{ end }}}" role="menuitem"><i class="fa fa-fw fa-bullhorn text-secondary"></i> [[topic:thread-tools.unmark-important]]</a>
 </li>
 
 {{{ if isNumber(cid) }}}
