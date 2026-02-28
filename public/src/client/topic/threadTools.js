@@ -61,6 +61,16 @@ define('forum/topic/threadTools', [
 			return false;
 		});
 
+		topicContainer.on('click', '[component="topic/mark-official"]', function () {
+			topicCommand('put', '/official', 'markOfficial');
+			return false;
+		});
+
+		topicContainer.on('click', '[component="topic/unmark-official"]', function () {
+			topicCommand('del', '/official', 'unmarkOfficial');
+			return false;
+		});
+
 		topicContainer.on('click', '[component="topic/mark-unread"]', function () {
 			topicCommand('del', '/read', undefined, () => {
 				if (app.previousUrl && !app.previousUrl.match('^/topic')) {
@@ -390,6 +400,21 @@ define('forum/topic/threadTools', [
 			));
 		}
 		ajaxify.data.pinned = data.pinned;
+
+		posts.addTopicEvents(data.events);
+	};
+
+	ThreadTools.setOfficialState = function (data) {
+		const threadEl = components.get('topic');
+		if (String(data.tid) !== threadEl.attr('data-tid')) {
+			return;
+		}
+
+		components.get('topic/mark-official').toggleClass('hidden', data.isOfficial).parent().attr('hidden', data.isOfficial ? '' : null);
+		components.get('topic/unmark-official').toggleClass('hidden', !data.isOfficial).parent().attr('hidden', !data.isOfficial ? '' : null);
+		const icon = $('[component="topic/labels"] [component="topic/official"]');
+		icon.toggleClass('hidden', !data.isOfficial);
+		ajaxify.data.isOfficial = data.isOfficial;
 
 		posts.addTopicEvents(data.events);
 	};
