@@ -153,14 +153,14 @@ topicsAPI.unpin = async function (caller, data) {
 	});
 };
 
-topicsAPI.markOfficial = async function (caller, data) {
-	await doTopicAction('markOfficial', 'event:topic_official', caller, {
+topicsAPI.markImportant = async function (caller, data) {
+	await doTopicAction('markImportant', 'event:topic_important', caller, {
 		tids: data.tids,
 	});
 };
 
-topicsAPI.unmarkOfficial = async function (caller, data) {
-	await doTopicAction('unmarkOfficial', 'event:topic_unofficial', caller, {
+topicsAPI.unmarkImportant = async function (caller, data) {
+	await doTopicAction('unmarkImportant', 'event:topic_unimportant', caller, {
 		tids: data.tids,
 	});
 };

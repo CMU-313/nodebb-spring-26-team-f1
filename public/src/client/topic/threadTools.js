@@ -61,13 +61,13 @@ define('forum/topic/threadTools', [
 			return false;
 		});
 
-		topicContainer.on('click', '[component="topic/mark-official"]', function () {
-			topicCommand('put', '/official', 'markOfficial');
+		topicContainer.on('click', '[component="topic/mark-important"]', function () {
+			topicCommand('put', '/important', 'markImportant');
 			return false;
 		});
 
-		topicContainer.on('click', '[component="topic/unmark-official"]', function () {
-			topicCommand('del', '/official', 'unmarkOfficial');
+		topicContainer.on('click', '[component="topic/unmark-important"]', function () {
+			topicCommand('del', '/important', 'unmarkImportant');
 			return false;
 		});
 
@@ -404,17 +404,17 @@ define('forum/topic/threadTools', [
 		posts.addTopicEvents(data.events);
 	};
 
-	ThreadTools.setOfficialState = function (data) {
+	ThreadTools.setImportantState = function (data) {
 		const threadEl = components.get('topic');
 		if (String(data.tid) !== threadEl.attr('data-tid')) {
 			return;
 		}
 
-		components.get('topic/mark-official').toggleClass('hidden', data.isOfficial).parent().attr('hidden', data.isOfficial ? '' : null);
-		components.get('topic/unmark-official').toggleClass('hidden', !data.isOfficial).parent().attr('hidden', !data.isOfficial ? '' : null);
-		const icon = $('[component="topic/labels"] [component="topic/official"]');
-		icon.toggleClass('hidden', !data.isOfficial);
-		ajaxify.data.isOfficial = data.isOfficial;
+		components.get('topic/mark-important').toggleClass('hidden', data.isImportant).parent().attr('hidden', data.isImportant ? '' : null);
+		components.get('topic/unmark-important').toggleClass('hidden', !data.isImportant).parent().attr('hidden', !data.isImportant ? '' : null);
+		const icon = $('[component="topic/labels"] [component="topic/important"]');
+		icon.toggleClass('hidden', !data.isImportant);
+		ajaxify.data.isImportant = data.isImportant;
 
 		posts.addTopicEvents(data.events);
 	};

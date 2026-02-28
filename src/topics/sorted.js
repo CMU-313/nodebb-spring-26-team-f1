@@ -183,7 +183,7 @@ module.exports = function (Topics) {
 		const { sortMap, fields } = await plugins.hooks.fire('filter:topics.sortOptions', {
 			params,
 			fields: [
-				'tid', 'timestamp', 'lastposttime', 'upvotes', 'downvotes', 'postcount', 'pinned', 'isOfficial',
+				'tid', 'timestamp', 'lastposttime', 'upvotes', 'downvotes', 'postcount', 'pinned', 'isImportant',
 			],
 			sortMap: {
 				recent: sortRecent,
@@ -212,8 +212,8 @@ module.exports = function (Topics) {
 		topicData.sort((a, b) => {
 			// Pinned topics come first
 			if (a.pinned !== b.pinned) return b.pinned - a.pinned;
-			// Then official topics
-			if (a.isOfficial !== b.isOfficial) return b.isOfficial - a.isOfficial;
+			// Then important topics
+			if (a.isImportant !== b.isImportant) return b.isImportant - a.isImportant;
 			// Then apply the normal sort function
 			return sortFn(a, b);
 		});

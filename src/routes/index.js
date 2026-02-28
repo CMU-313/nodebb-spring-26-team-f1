@@ -82,6 +82,7 @@ _mounts.categories = (app, name, middleware, controllers) => {
 	setupPageRoute(app, '/recent', [], controllers.recent.get);
 	setupPageRoute(app, '/top', [], controllers.top.get);
 	setupPageRoute(app, '/unread', [middleware.ensureLoggedIn], controllers.unread.get);
+	setupPageRoute(app, '/reading-list', [], controllers['reading-list'].get);
 };
 
 _mounts.category = (app, name, middleware, controllers) => {

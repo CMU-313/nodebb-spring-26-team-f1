@@ -201,15 +201,15 @@ module.exports = function (Topics) {
 		return topicData;
 	}
 
-	topicTools.markOfficial = async function (tid, uid) {
-		return await toggleOfficial(tid, uid, true);
+	topicTools.markImportant = async function (tid, uid) {
+		return await toggleImportant(tid, uid, true);
 	};
 
-	topicTools.unmarkOfficial = async function (tid, uid) {
-		return await toggleOfficial(tid, uid, false);
+	topicTools.unmarkImportant = async function (tid, uid) {
+		return await toggleImportant(tid, uid, false);
 	};
 
-	async function toggleOfficial(tid, uid, official) {
+	async function toggleImportant(tid, uid, important) {
 		const topicData = await Topics.getTopicData(tid);
 		if (!topicData) {
 			throw new Error('[[error:no-topic]]');
@@ -219,13 +219,13 @@ module.exports = function (Topics) {
 			throw new Error('[[error:no-privileges]]');
 		}
 
-		await Topics.setTopicField(tid, 'isOfficial', official ? 1 : 0);
-		const events = await Topics.events.log(tid, { type: official ? 'official' : 'unofficial', uid });
+		await Topics.setTopicField(tid, 'isImportant', important ? 1 : 0);
+		const events = await Topics.events.log(tid, { type: important ? 'important' : 'unimportant', uid });
 
-		topicData.isOfficial = official;
+		topicData.isImportant = important;
 		topicData.events = events;
 
-		plugins.hooks.fire('action:topic.official', { topic: _.clone(topicData), uid });
+		plugins.hooks.fire('action:topic.important', { topic: _.clone(topicData), uid });
 
 		return topicData;
 	}
