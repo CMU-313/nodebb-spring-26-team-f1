@@ -120,6 +120,10 @@ if (document.readyState === 'loading') {
 			messages.show();
 			appLoaded = true;
 		});
+
+		require(['forum/assignment-tags'], function (AssignmentTags) {
+			AssignmentTags.init();
+		});
 	};
 
 	app.require = async function (modules) {

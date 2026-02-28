@@ -1,0 +1,72 @@
+post:
+  tags:
+    - assignment-tags
+  summary: add an assignment tag to a post
+  description: This operation adds a single assignment tag to a post via the assignment-tags route.
+  parameters:
+    - in: path
+      name: pid
+      schema:
+        type: string
+      required: true
+      description: a valid post id
+      example: 2
+    - in: path
+      name: tagId
+      schema:
+        type: string
+      required: true
+      description: a valid assignment tag id
+      example: 1
+  responses:
+    '200':
+      description: Assignment tag successfully added
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../../../components/schemas/Status.yaml#/Status
+              response:
+                type: array
+                items:
+                  type: object
+    '400':
+      $ref: ../../../../components/responses/400.yaml#/400
+delete:
+  tags:
+    - assignment-tags
+  summary: remove an assignment tag from a post
+  description: This operation removes a single assignment tag from a post via the assignment-tags route.
+  parameters:
+    - in: path
+      name: pid
+      schema:
+        type: string
+      required: true
+      description: a valid post id
+      example: 2
+    - in: path
+      name: tagId
+      schema:
+        type: string
+      required: true
+      description: a valid assignment tag id
+      example: 1
+  responses:
+    '200':
+      description: Assignment tag successfully removed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../../../components/schemas/Status.yaml#/Status
+              response:
+                type: array
+                items:
+                  type: object
+    '400':
+      $ref: ../../../../components/responses/400.yaml#/400

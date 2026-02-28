@@ -234,3 +234,7 @@ get:
                         flagId:
                           type: number
                           description: The flag identifier, if this particular post has been flagged before
+                        assignmentTags:
+                          type: array
+                          items:
+                            type: object

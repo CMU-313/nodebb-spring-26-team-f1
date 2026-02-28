@@ -12,15 +12,11 @@ module.exports = {
 			return;
 		}
 
-		// Initialize resolution fields for all existing topics in batches
-		const batchSize = 1000;
-		for (let i = 0; i < topics.length; i += batchSize) {
-			const batch = topics.slice(i, i + batchSize);
-			await Promise.all(batch.map(tid => db.setObject(`topic:${tid}`, {
-				isResolved: 0,
-				resolvedAt: null,
-				resolvedBy: null,
-			})));
-		}
+		// Initialize resolution fields for all existing topics
+		await Promise.all(topics.map(tid => db.setObject(`topic:${tid}`, {
+			isResolved: 0,
+			resolvedAt: null,
+			resolvedBy: null,
+		})));
 	},
 };

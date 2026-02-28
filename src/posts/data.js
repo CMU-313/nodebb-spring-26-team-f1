@@ -23,6 +23,12 @@ module.exports = function (Posts) {
 			fields: fields,
 		});
 		result.posts.forEach(post => modifyPost(post, fields));
+
+		// Add assignment tags if requested or if no specific fields requested
+		if (!fields.length || fields.includes('assignmentTags')) {
+			await addAssignmentTagsToPosts(result.posts);
+		}
+
 		return result.posts;
 	};
 
@@ -79,4 +85,43 @@ function modifyPost(post, fields) {
 			}
 		}
 	}
+}
+
+async function addAssignmentTagsToPostsBulk(posts) {
+	if (!posts || !posts.length) {
+		return;
+	}
+	try {
+		const assignmentTags = require('../assignment-tags');
+		const pids = posts.map(p => p.pid).filter(Boolean);
+
+		// Fetch all tags for all posts in parallel
+		const tagResults = await Promise.all(
+			pids.map(pid => assignmentTags.getPostTags(pid).catch(() => []))
+		);
+
+		// Map tags to posts
+		const tagMap = {};
+		pids.forEach((pid, index) => {
+			tagMap[pid] = tagResults[index];
+		});
+
+		// Add tags to each post
+		posts.forEach((post) => {
+			if (post && post.pid) {
+				post.assignmentTags = tagMap[post.pid] || [];
+			}
+		});
+	} catch (err) {
+		// Silently fail if assignment tags are not available
+		posts.forEach((post) => {
+			if (post) {
+				post.assignmentTags = [];
+			}
+		});
+	}
+}
+
+async function addAssignmentTagsToPosts(posts) {
+	return await addAssignmentTagsToPostsBulk(posts);
 }

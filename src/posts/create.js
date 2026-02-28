@@ -10,6 +10,9 @@ const groups = require('../groups');
 const activitypub = require('../activitypub');
 const utils = require('../utils');
 
+
+const sockets = require('../socket.io'); 
+
 module.exports = function (Posts) {
 	Posts.create = async function (data) {
 		// This is an internal method, consider using Topics.reply instead
@@ -88,13 +91,59 @@ module.exports = function (Posts) {
 			Posts.uploads.sync(pid),
 			hasAttachment ? Posts.attachments.update(pid, _activitypub.attachment) : null,
 			topics.autoResolveIfNeeded(tid, uid, topicData.cid),
+			addAssignmentTags(postData.pid, data.assignmentTags),
 		]);
 
 		const result = await plugins.hooks.fire('filter:post.get', { post: postData, uid: data.uid });
 		result.post.isMain = isMain;
 		plugins.hooks.fire('action:post.save', { post: { ...result.post, _activitypub } });
+		if (!isMain && sockets.server) {
+			try {
+				const [topicTitle, targetUid] = await Promise.all([
+					topics.getTopicField(tid, 'title'),
+					getNotificationTarget(tid, postData),
+				]);
+
+				// Only notify if the replier is not the target user
+				const isSelfReply = Number(targetUid) === Number(uid);
+				if (!isSelfReply) {
+					const excerpt = postData.content || '';
+					sendReplyNotification(
+						targetUid,
+						topicTitle,
+						tid,
+						result.post.pid,
+						uid,
+						excerpt
+					);
+				}
+			} catch (error) {
+				console.error('notification failed:', error);
+			}
+		}
 		return result.post;
 	};
+
+	async function getNotificationTarget(tid, postData) {
+		if (postData.toPid) {
+			return Posts.getPostField(postData.toPid, 'uid');
+		}
+		return topics.getTopicField(tid, 'uid');
+	}
+
+	function sendReplyNotification(targetUid, topicTitle, tid, pid, fromUid, excerpt) {
+		sockets.server.to(`uid_${targetUid}`).emit('event:alert', {
+			title: 'Reply!',
+			message: `There is a reply in: ${topicTitle}`,
+			topicId: tid,
+			postId: pid,
+			fromUid: fromUid,
+			excerpt: excerpt ? excerpt.slice(0, 50) + '...' : '',
+			type: 'info',
+			timeout: 5000,
+			icon: '/assets/reply-icon.png',
+		});
+	}
 
 	async function addReplyTo(postData, timestamp) {
 		if (!postData.toPid) {
@@ -104,5 +153,20 @@ module.exports = function (Posts) {
 			db.sortedSetAdd(`pid:${postData.toPid}:replies`, timestamp, postData.pid),
 			db.incrObjectField(`post:${postData.toPid}`, 'replies'),
 		]);
+	}
+
+	async function addAssignmentTags(pid, tags) {
+		if (!tags || !Array.isArray(tags) || tags.length === 0) {
+			return;
+		}
+		const assignmentTags = require('../assignment-tags');
+		try {
+			await assignmentTags.setPostTags(pid, tags);
+		} catch (err) {
+			// Silently fail if assignment tags are not available (e.g., MongoDB)
+			if (err.message !== '[[error:assignment-tags-postgres-only]]') {
+				throw err;
+			}
+		}
 	}
 };
