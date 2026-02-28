@@ -105,12 +105,21 @@ app = window.app || {};
 			require(['logout'], function (logout) {
 				logout();
 			});
-		});
+		}); 
 		socket.on('event:alert', function (params) {
-			require(['alerts'], function (alerts) {
-				alerts.alert(params);
+			const content = params.excerpt ? `${params.message}\n"${params.excerpt}"` : params.message;
+			alert({
+				title: params.title,
+				message: content,
+				type: params.type || 'info',
+				timeout: params.timeout || 5000,
+				icon: params.icon,
+				clickfn: params.topicId && params.postId ? function () {
+					window.location.href = `/topic/${params.topicId}#post-${params.postId}`;
+				} : null,
 			});
 		});
+
 		socket.on('event:deprecated_call', (data) => {
 			console.warn('[socket.io]', data.eventName, 'is now deprecated', data.replacement ? `in favour of ${data.replacement}` : 'with no alternative planned.');
 		});
