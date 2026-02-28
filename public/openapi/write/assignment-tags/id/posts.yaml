@@ -25,3 +25,5 @@ get:
                 type: array
                 items:
                   type: object
+    '400':
+      $ref: ../../../components/responses/400.yaml#/400

@@ -23,6 +23,8 @@ get:
                 $ref: ../../components/schemas/Status.yaml#/Status
               response:
                 type: object
+    '400':
+      $ref: ../../components/responses/400.yaml#/400
 put:
   tags:
     - assignment-tags
@@ -61,6 +63,8 @@ put:
                 $ref: ../../components/schemas/Status.yaml#/Status
               response:
                 type: object
+    '400':
+      $ref: ../../components/responses/400.yaml#/400
 delete:
   tags:
     - assignment-tags
@@ -87,3 +91,5 @@ delete:
               response:
                 type: object
                 properties: {}
+    '400':
+      $ref: ../../components/responses/400.yaml#/400

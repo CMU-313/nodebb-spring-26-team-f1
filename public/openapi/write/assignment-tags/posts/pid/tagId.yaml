@@ -32,6 +32,8 @@ post:
                 type: array
                 items:
                   type: object
+    '400':
+      $ref: ../../../../components/responses/400.yaml#/400
 delete:
   tags:
     - assignment-tags
@@ -66,3 +68,5 @@ delete:
                 type: array
                 items:
                   type: object
+    '400':
+      $ref: ../../../../components/responses/400.yaml#/400
