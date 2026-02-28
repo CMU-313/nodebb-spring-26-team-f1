@@ -70,6 +70,15 @@
 						<a href="{config.relative_path}/tags/{./valueEncoded}"><span class="badge border border-gray-300 fw-normal tag tag-class-{./class}" data-tag="{./value}">{./valueEscaped}</span></a>
 						{{{ end }}}
 					</span>
+					{{{ if ./assignmentTags.length }}}
+					<span component="topic/assignment-tags" class="lh-1 d-flex flex-wrap gap-1">
+						{{{ each ./assignmentTags }}}
+						<a href="#" class="assignment-tag-chip badge rounded-pill text-decoration-none" data-tag-id="{./id}" style="background-color: {./color}; color: #fff;">
+							<i class="fa fa-tag"></i> {./name}
+						</a>
+						{{{ end }}}
+					</span>
+					{{{ end }}}
 
 					<div class="d-flex gap-1 d-block d-lg-none w-100">
 						<span class="badge text-body border stats text-xs text-muted">

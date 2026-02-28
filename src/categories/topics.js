@@ -12,6 +12,69 @@ const batch = require('../batch');
 const utils = require('../utils');
 
 module.exports = function (Categories) {
+	async function filterTopicsByAssignmentTags(topicsData, tagIdsParam) {
+		if (!topicsData || !topicsData.length || !tagIdsParam) {
+			return topicsData;
+		}
+
+		// Parse tag IDs from string or array
+		let tagIds;
+		if (typeof tagIdsParam === 'string') {
+			tagIds = tagIdsParam.split(',').map(id => parseInt(id.trim(), 10)).filter(id => !isNaN(id));
+		} else if (Array.isArray(tagIdsParam)) {
+			tagIds = tagIdsParam.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+		} else {
+			return topicsData;
+		}
+
+		if (!tagIds.length) {
+			return topicsData;
+		}
+
+		try {
+			const assignmentTags = require('../assignment-tags');
+			// Get main post IDs for each topic
+			const mainPids = await Promise.all(
+				topicsData.map(topic => topics.getTopicField(topic.tid, 'mainPid'))
+			);
+
+			// Filter PIDs by assignment tags
+			const filteredPids = await assignmentTags.filterPostsByTags(mainPids, tagIds);
+			const filteredPidSet = new Set(filteredPids.map(pid => String(pid)));
+
+			// Filter topics to only include those with matching main posts
+			return topicsData.filter((topic, index) => filteredPidSet.has(String(mainPids[index])));
+		} catch (err) {
+			// If assignment tags are not available (e.g., MongoDB), return all topics
+			if (err.message === '[[error:assignment-tags-postgres-only]]') {
+				return topicsData;
+			}
+			throw err;
+		}
+	}
+
+	async function addAssignmentTagsToTopics(topicsData) {
+		if (!topicsData || !topicsData.length) {
+			return;
+		}
+		try {
+			const assignmentTags = require('../assignment-tags');
+			const mainPids = await Promise.all(
+				topicsData.map(topic => topics.getTopicField(topic.tid, 'mainPid'))
+			);
+			const tagArrays = await Promise.all(
+				mainPids.map(pid => (pid ? assignmentTags.getPostTags(pid).catch(() => []) : Promise.resolve([])))
+			);
+			topicsData.forEach((topic, i) => {
+				topic.assignmentTags = tagArrays[i] || [];
+			});
+		} catch (err) {
+			topicsData.forEach((topic) => {
+				topic.assignmentTags = [];
+			});
+		}
+	}
+
 	Categories.getCategoryTopics = async function (data) {
 		if (data) {
 			if (typeof data.resolved === 'string') {
@@ -58,10 +121,18 @@ module.exports = function (Categories) {
 			topicsData = topicsData.filter(topic => topic && parseInt(topic.isResolved, 10) !== 1);
 		}
 
+		// Optional filter: filter by assignment tags when requested
+		if (data && data.assignmentTags) {
+			topicsData = await filterTopicsByAssignmentTags(topicsData, data.assignmentTags);
+		}
+
 		if (!topicsData.length) {
 			return { topics: [], uid: data.uid };
 		}
 		topics.calculateTopicIndices(topicsData, data.start);
+
+		// Attach assignment tags to each topic (from main post)
+		await addAssignmentTagsToTopics(topicsData);
 
 		results = await plugins.hooks.fire('filter:category.topics.get', { cid: data.cid, topics: topicsData, uid: data.uid });
 		return { topics: results.topics, nextStart: data.stop + 1 };

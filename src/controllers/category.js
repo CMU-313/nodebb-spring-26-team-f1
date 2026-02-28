@@ -186,6 +186,14 @@ categoryController.get = async function (req, res, next) {
 		}
 	}
 
+	// Attach all assignment tags for filter dropdown
+	try {
+		const assignmentTagsModule = require('../assignment-tags');
+		categoryData.assignmentTags = await assignmentTagsModule.getAll();
+	} catch (err) {
+		categoryData.assignmentTags = [];
+	}
+
 	res.render('category', categoryData);
 };
 

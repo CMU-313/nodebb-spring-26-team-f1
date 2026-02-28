@@ -214,6 +214,20 @@ paths:
     $ref: 'write/posts/pid/owner.yaml'
   /posts/owner:
     $ref: 'write/posts/owner.yaml'
+  /posts/{pid}/assignment-tags:
+    $ref: 'write/posts/pid/assignment-tags.yaml'
+  /posts/{pid}/assignment-tags/{tagId}:
+    $ref: 'write/posts/pid/assignment-tags/tagId.yaml'
+  /assignment-tags/:
+    $ref: 'write/assignment-tags.yaml'
+  /assignment-tags/{id}:
+    $ref: 'write/assignment-tags/id.yaml'
+  /assignment-tags/{id}/posts:
+    $ref: 'write/assignment-tags/id/posts.yaml'
+  /assignment-tags/posts/{pid}:
+    $ref: 'write/assignment-tags/posts/pid.yaml'
+  /assignment-tags/posts/{pid}/{tagId}:
+    $ref: 'write/assignment-tags/posts/pid/tagId.yaml'
   /chats/:
     $ref: 'write/chats.yaml'
   /chats/unread:

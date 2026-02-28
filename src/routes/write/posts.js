@@ -49,6 +49,12 @@ module.exports = function () {
 	setupApiRoute(router, 'put', '/:pid/owner', [middleware.ensureLoggedIn, middleware.assert.post, middleware.checkRequired.bind(null, ['uid'])], controllers.write.posts.changeOwner);
 	setupApiRoute(router, 'post', '/owner', [middleware.ensureLoggedIn, middleware.checkRequired.bind(null, ['pids', 'uid'])], controllers.write.posts.changeOwner);
 
+	// Assignment tags routes
+	setupApiRoute(router, 'get', '/:pid/assignment-tags', [middleware.ensureLoggedIn], controllers.write.assignmentTags.getPostTags);
+	setupApiRoute(router, 'put', '/:pid/assignment-tags', [middleware.ensureLoggedIn], controllers.write.assignmentTags.setPostTags);
+	setupApiRoute(router, 'post', '/:pid/assignment-tags/:tagId', [middleware.ensureLoggedIn], controllers.write.assignmentTags.addToPost);
+	setupApiRoute(router, 'delete', '/:pid/assignment-tags/:tagId', [middleware.ensureLoggedIn], controllers.write.assignmentTags.removeFromPost);
+
 	// Shorthand route to access post routes by topic index
 	router.all('/+byIndex/:index*?', [middleware.checkRequired.bind(null, ['tid'])], controllers.write.posts.redirectByIndex);
 

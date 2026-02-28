@@ -390,5 +390,9 @@ PostDataObject:
           description: The markdown equivalent of a remote post content, as received (or fetched) from the remote site.
         isAnonymous:
           type: number
+        assignmentTags:
+          type: array
+          items:
+            type: object
       required:
         - pid

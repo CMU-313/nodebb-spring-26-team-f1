@@ -325,5 +325,9 @@ TopicObjectSlim:
           type: string
           nullable: true
           description: JSON string containing uid and role of the resolver
+        assignmentTags:
+          type: array
+          items:
+            type: object
       required:
         - tid

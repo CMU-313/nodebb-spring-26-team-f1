@@ -1,3 +1,58 @@
+#### v1.20.0 (2024-02-27) - Assignment Tags Feature
+
+##### New Features
+
+* **Assignment Tags System** - Complete post tagging system for course organization
+  * Tag CRUD API with instructor-only access control
+  * PostgreSQL-based database schema with `assignment_tags` and `post_tags` tables
+  * Tag assignment on post creation and editing
+  * Topic filtering by tags (single and multiple, OR operation)
+  * Admin management interface for creating, editing, and deleting tags
+  * Frontend tag display with colored chips on posts
+  * Frontend filter dropdown for multi-tag filtering
+  * Clickable tags for instant filtering
+  * Auto-loader for seamless integration across pages
+
+##### Documentation
+
+* **API Documentation** - Complete API reference with request/response schemas (`docs/assignment-tags-api.md`)
+* **Database Schema Documentation** - ER diagrams and schema details (`docs/assignment-tags-database-schema.md`)
+* **User Guide** - Comprehensive instructor guide with best practices (`docs/assignment-tags-user-guide.md`)
+* **Developer Guide** - Onboarding guide for developers (`docs/assignment-tags-developer-guide.md`)
+
+##### Tests
+
+* **Comprehensive Test Suite** - 600+ lines covering:
+  * Tag CRUD operations with authorization guards
+  * Tag assignment (add/remove tags on posts)
+  * Tag filtering (single tag, multiple tags, pagination)
+  * Integration tests for full workflow
+  * Edge cases (deleting tags in use, invalid tag IDs, cascade deletes)
+  * Concurrent operations and race conditions
+  * Located at: `test/assignment-tags.js`
+
+##### Technical Details
+
+* **Database**: PostgreSQL 9.5+ required (graceful degradation for MongoDB/Redis)
+* **Migration**: `src/upgrades/1.20.0/assignment_tags_schema.js`
+* **Backend Files**:
+  * Business logic: `src/assignment-tags/index.js`
+  * API layer: `src/api/assignment-tags.js`
+  * Controllers: `src/controllers/write/assignment-tags.js`, `src/controllers/admin/assignment-tags.js`
+  * Routes: `src/routes/write/assignment-tags.js`
+* **Frontend Files**:
+  * Admin UI: `public/src/admin/manage/assignment-tags.js`
+  * Forum display: `public/src/client/assignment-tags.js`
+  * Auto-loader: `public/src/client/assignment-tags-loader.js`
+  * Reusable module: `public/src/modules/assignment-tags.js`
+  * Styles: `public/scss/assignment-tags.scss`
+* **Integration Points**:
+  * Post creation: `src/posts/create.js`
+  * Post data fetching: `src/posts/data.js`
+  * Category filtering: `src/categories/topics.js`
+
+---
+
 #### v4.7.2 (2025-12-24)
 
 ##### Chores
