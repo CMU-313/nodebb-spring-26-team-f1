@@ -1946,6 +1946,71 @@ describe('Controllers', () => {
 		});
 	});
 
+	describe('reading list', () => {
+		let importantTid1;
+		let importantTid2;
+		let regularTid;
+
+		before(async () => {
+			// Create test topics
+			const result1 = await topics.post({
+				uid: adminUid,
+				cid: cid,
+				title: 'Important Topic 1',
+				content: 'This is an important announcement',
+			});
+			importantTid1 = result1.topicData.tid;
+
+			const result2 = await topics.post({
+				uid: adminUid,
+				cid: cid,
+				title: 'Important Topic 2',
+				content: 'This is another important announcement',
+			});
+			importantTid2 = result2.topicData.tid;
+
+			const result3 = await topics.post({
+				uid: adminUid,
+				cid: cid,
+				title: 'Regular Topic',
+				content: 'This is a regular topic',
+			});
+			regularTid = result3.topicData.tid;
+
+			// Mark topics as important
+			await topics.tools.markImportant(importantTid1, adminUid);
+			await topics.tools.markImportant(importantTid2, adminUid);
+		});
+
+		it('should display reading list page', async () => {
+			const { response, body } = await request.get(`${nconf.get('url')}/api/reading-list`);
+			assert.strictEqual(response.statusCode, 200);
+			assert(body.topics);
+			assert(Array.isArray(body.topics));
+		});
+
+		it('should only show important topics in reading list', async () => {
+			const { response, body } = await request.get(`${nconf.get('url')}/api/reading-list`);
+			assert.strictEqual(response.statusCode, 200);
+			
+			const tids = body.topics.map(t => String(t.tid));
+			assert(tids.includes(String(importantTid1)), 'Important topic 1 should be in reading list');
+			assert(tids.includes(String(importantTid2)), 'Important topic 2 should be in reading list');
+			assert(!tids.includes(String(regularTid)), 'Regular topic should not be in reading list');
+		});
+
+		it('should update reading list when topic is unmarked as important', async () => {
+			await topics.tools.unmarkImportant(importantTid1, adminUid);
+			
+			const { response, body } = await request.get(`${nconf.get('url')}/api/reading-list`);
+			assert.strictEqual(response.statusCode, 200);
+			
+			const tids = body.topics.map(t => String(t.tid));
+			assert(!tids.includes(String(importantTid1)), 'Unmarked topic should not be in reading list');
+			assert(tids.includes(String(importantTid2)), 'Important topic 2 should still be in reading list');
+		});
+	});
+
 	after((done) => {
 		const analytics = require('../src/analytics');
 		analytics.writeData(done);
