@@ -201,6 +201,35 @@ module.exports = function (Topics) {
 		return topicData;
 	}
 
+	topicTools.markImportant = async function (tid, uid) {
+		return await toggleImportant(tid, uid, true);
+	};
+
+	topicTools.unmarkImportant = async function (tid, uid) {
+		return await toggleImportant(tid, uid, false);
+	};
+
+	async function toggleImportant(tid, uid, important) {
+		const topicData = await Topics.getTopicData(tid);
+		if (!topicData) {
+			throw new Error('[[error:no-topic]]');
+		}
+
+		if (!await privileges.topics.isAdminOrMod(tid, uid)) {
+			throw new Error('[[error:no-privileges]]');
+		}
+
+		await Topics.setTopicField(tid, 'isImportant', important ? 1 : 0);
+		const events = await Topics.events.log(tid, { type: important ? 'important' : 'unimportant', uid });
+
+		topicData.isImportant = important;
+		topicData.events = events;
+
+		plugins.hooks.fire('action:topic.important', { topic: _.clone(topicData), uid });
+
+		return topicData;
+	}
+
 	topicTools.orderPinnedTopics = async function (uid, data) {
 		const { tid, order } = data;
 		const cid = await Topics.getTopicField(tid, 'cid');

@@ -61,6 +61,16 @@ define('forum/topic/threadTools', [
 			return false;
 		});
 
+		topicContainer.on('click', '[component="topic/mark-important"]', function () {
+			topicCommand('put', '/important', 'markImportant');
+			return false;
+		});
+
+		topicContainer.on('click', '[component="topic/unmark-important"]', function () {
+			topicCommand('del', '/important', 'unmarkImportant');
+			return false;
+		});
+
 		topicContainer.on('click', '[component="topic/mark-unread"]', function () {
 			topicCommand('del', '/read', undefined, () => {
 				if (app.previousUrl && !app.previousUrl.match('^/topic')) {
@@ -390,6 +400,21 @@ define('forum/topic/threadTools', [
 			));
 		}
 		ajaxify.data.pinned = data.pinned;
+
+		posts.addTopicEvents(data.events);
+	};
+
+	ThreadTools.setImportantState = function (data) {
+		const threadEl = components.get('topic');
+		if (String(data.tid) !== threadEl.attr('data-tid')) {
+			return;
+		}
+
+		components.get('topic/mark-important').toggleClass('hidden', data.isImportant).parent().attr('hidden', data.isImportant ? '' : null);
+		components.get('topic/unmark-important').toggleClass('hidden', !data.isImportant).parent().attr('hidden', !data.isImportant ? '' : null);
+		const icon = $('[component="topic/labels"] [component="topic/important"]');
+		icon.toggleClass('hidden', !data.isImportant);
+		ajaxify.data.isImportant = data.isImportant;
 
 		posts.addTopicEvents(data.events);
 	};
