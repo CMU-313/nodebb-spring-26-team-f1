@@ -1,0 +1,89 @@
+get:
+  tags:
+    - assignment-tags
+  summary: get an assignment tag
+  description: This operation retrieves a single assignment tag by id.
+  parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: a valid assignment tag id
+      example: 1
+  responses:
+    '200':
+      description: Assignment tag successfully retrieved
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../components/schemas/Status.yaml#/Status
+              response:
+                type: object
+put:
+  tags:
+    - assignment-tags
+  summary: update an assignment tag
+  description: This operation updates an assignment tag.
+  parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: a valid assignment tag id
+      example: 1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            color:
+              type: string
+            category:
+              type: string
+  responses:
+    '200':
+      description: Assignment tag successfully updated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../components/schemas/Status.yaml#/Status
+              response:
+                type: object
+delete:
+  tags:
+    - assignment-tags
+  summary: delete an assignment tag
+  description: This operation deletes an assignment tag.
+  parameters:
+    - in: path
+      name: id
+      schema:
+        type: string
+      required: true
+      description: a valid assignment tag id
+      example: 1
+  responses:
+    '200':
+      description: Assignment tag successfully deleted
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../components/schemas/Status.yaml#/Status
+              response:
+                type: object
+                properties: {}

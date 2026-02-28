@@ -1,0 +1,65 @@
+get:
+  tags:
+    - assignment-tags
+  summary: get assignment tags for a post
+  description: This operation retrieves assignment tags for a post via the assignment-tags route.
+  parameters:
+    - in: path
+      name: pid
+      schema:
+        type: string
+      required: true
+      description: a valid post id
+      example: 2
+  responses:
+    '200':
+      description: Assignment tags successfully retrieved
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../../components/schemas/Status.yaml#/Status
+              response:
+                type: array
+                items:
+                  type: object
+put:
+  tags:
+    - assignment-tags
+  summary: set assignment tags for a post
+  description: This operation replaces all assignment tags on a post via the assignment-tags route.
+  parameters:
+    - in: path
+      name: pid
+      schema:
+        type: string
+      required: true
+      description: a valid post id
+      example: 2
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            tagIds:
+              type: array
+              items:
+                type: number
+  responses:
+    '200':
+      description: Assignment tags successfully updated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../../components/schemas/Status.yaml#/Status
+              response:
+                type: array
+                items:
+                  type: object

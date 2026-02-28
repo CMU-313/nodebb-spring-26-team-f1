@@ -1,0 +1,51 @@
+get:
+  tags:
+    - assignment-tags
+  summary: list all assignment tags
+  description: This operation retrieves all assignment tags.
+  responses:
+    '200':
+      description: Assignment tags successfully retrieved
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../components/schemas/Status.yaml#/Status
+              response:
+                type: array
+                items:
+                  type: object
+post:
+  tags:
+    - assignment-tags
+  summary: create an assignment tag
+  description: This operation creates a new assignment tag.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            color:
+              type: string
+            category:
+              type: string
+          required:
+            - name
+  responses:
+    '200':
+      description: Assignment tag successfully created
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../components/schemas/Status.yaml#/Status
+              response:
+                type: object
