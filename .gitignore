@@ -78,3 +78,8 @@ test.sh
 dump.rdb
 .archiver_shadow/
 .snapshots/
+
+# Retire.js / Jalangi analysis artifacts
+*_jalangi_.*
+jalangi_output*
+retire_output*
