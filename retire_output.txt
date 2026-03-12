@@ -1,9 +1,0 @@
-retire.js v5.4.2
-Downloading https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository-v5.json ...
-Could not follow symlink: /workspaces/nodebb-spring-26-team-f1/build/public/plugins/core/inter
-Could not follow symlink: /workspaces/nodebb-spring-26-team-f1/build/public/plugins/nodebb-plugin-emoji/emoji
-Could not follow symlink: /workspaces/nodebb-spring-26-team-f1/build/public/plugins/core/poppins
-Could not follow symlink: /workspaces/nodebb-spring-26-team-f1/build/public/plugins/nodebb-plugin-web-push/static
-Could not follow symlink: /workspaces/nodebb-spring-26-team-f1/build/public/plugins/nodebb-theme-harmony/inter
-Could not follow symlink: /workspaces/nodebb-spring-26-team-f1/build/public/plugins/nodebb-theme-harmony/poppins
-Could not follow symlink: /workspaces/nodebb-spring-26-team-f1/build/public/plugins/nodebb-plugin-markdown/styles
