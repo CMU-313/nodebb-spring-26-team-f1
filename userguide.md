@@ -4,6 +4,7 @@
 
 1. [Anonymous Posting Feature](#user-guide-anonymous-posting-feature)
 2. [Assignment Tags Feature](#user-guide-assignment-tags-feature)
+3. [Reply Notification Popups Feature](#user-guide-reply-notification-popups)
 
 ---
 
@@ -417,3 +418,94 @@ The test suite covers the following scenarios:
 | `src/controllers/write/index.js` | Register the `assignmentTags` controller |
 | `src/routes/write/index.js` | Mount assignment-tags routes at `/api/v3/assignment-tags` |
 | `src/routes/admin.js` | Add admin route for the assignment tags management page |
+
+---
+
+# User Guide: Reply Notification Popups
+
+## Overview
+
+The Reply Notification Popups feature ensures that when a user replies to a topic or post, the original poster receives a real-time popup notification. It also prevents notifications for self-replies.
+
+## How It Works
+
+### Real-Time Notifications
+
+- Sends a popup alert to the original poster when another user replies to their topic or post.
+- Uses the existing socket server infrastructure for immediate delivery.
+
+### Edge-Case Handling
+
+- Notifications are only sent for non-self replies.
+- Notifications are only triggered for reply posts, not main topic posts.
+
+### Clickable Notification Behavior
+
+- Clicking the popup navigates the user directly to the reply inside the topic.
+- Popup includes:
+  - Title: `Reply!`
+  - Message: `There is a reply in: [topic title]`
+  - Optional excerpt (when available)
+  - Timeout (default 5 seconds)
+
+## User Testing Instructions
+
+### Test Scenario 1: Replying to a Topic
+
+1. Log in as any user.
+2. Navigate to a topic and post a reply.
+3. If the replier is not the original poster, the original poster should receive a popup notification immediately.
+
+### Test Scenario 2: Viewing Notifications
+
+1. Trigger a reply from a second user.
+2. Confirm that the original poster sees a popup notification on screen.
+
+### Test Scenario 3: Self-Reply Handling
+
+1. Reply to your own topic/post.
+2. Confirm that no notification is sent.
+
+### Test Scenario 4: Manual UI Validation
+
+1. Create two users: Original Poster and Replier.
+2. Have Original Poster create a topic.
+3. Log in as Replier and post a reply.
+4. Confirm Original Poster receives exactly one popup.
+5. Click the popup and confirm navigation to the reply post.
+
+Expected:
+- Original Poster receives exactly one notification for a valid reply.
+- Self-replies do not trigger notifications.
+- Popup text and optional excerpt render correctly.
+
+## Automated Tests
+
+### Location
+
+Automated tests for this feature are located at:
+
+**`test/notifications.js`**
+
+### Running the Tests
+
+```bash
+./node_modules/.bin/mocha test/notifications.js --grep "reply notification"
+```
+
+### What Is Tested
+
+1. **Notification triggering**
+   - A reply by a second user triggers a notification to the original poster.
+
+2. **Self-reply prevention**
+   - A user replying to their own post does not trigger a notification.
+
+3. **Real-time delivery**
+   - A mock socket server verifies notification emission behavior.
+
+### Why These Tests Are Sufficient
+
+- Covers all key paths: topic replies, post replies, and self-replies.
+- Verifies real-time socket emission behavior.
+- Includes edge behavior via early-return paths (for missing IDs and invalid reply context).
