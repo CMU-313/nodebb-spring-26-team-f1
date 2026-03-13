@@ -1,5 +1,17 @@
 {
+  "scripts": {
+    "build:fuzz-targets": "tsc -p tsconfig.fast-fuzz.json",
+    "fuzz:user-input": "node scripts/fuzz-user-input.js",
+    "fuzz:user-input:verbose": "FAST_FUZZ_VERBOSE=1 node scripts/fuzz-user-input.js",
+    "fuzz:user-input:force": "FAST_FUZZ_FORCE=1 node scripts/fuzz-user-input.js"
+  },
   "devDependencies": {
-    "flow-bin": "^0.304.0"
+    "fast-fuzz": "^5.1.6",
+    "flow-bin": "^0.304.0",
+    "reflect-metadata": "^0.2.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "fast-fuzz-shim": "^1.0.5"
   }
 }
