@@ -655,6 +655,29 @@ describe('Topic\'s', () => {
 			assert.strictEqual(pinned, 0);
 		});
 
+		it('should mark topic as important', async () => {
+			await apiTopics.markImportant({ uid: adminUid }, { tids: [newTopic.tid] });
+			const isImportant = await topics.getTopicField(newTopic.tid, 'isImportant');
+			assert.strictEqual(isImportant, 1);
+		});
+
+		it('should unmark topic as important', async () => {
+			await apiTopics.unmarkImportant({ uid: adminUid }, { tids: [newTopic.tid] });
+			const isImportant = await topics.getTopicField(newTopic.tid, 'isImportant');
+			assert.strictEqual(isImportant, 0);
+		});
+
+		it('should allow only admins/mods to mark topics as important', async () => {
+			let errorThrown = false;
+			try {
+				await apiTopics.markImportant({ uid: fooUid }, { tids: [newTopic.tid] });
+			} catch (err) {
+				errorThrown = true;
+				assert(err.message.includes('privilege'));
+			}
+			assert(errorThrown, 'Expected privilege error to be thrown');
+		});
+
 		it('should move all topics', (done) => {
 			socketTopics.moveAll({ uid: adminUid }, { cid: moveCid, currentCid: categoryObj.cid }, (err) => {
 				assert.ifError(err);
@@ -855,6 +878,68 @@ describe('Topic\'s', () => {
 					});
 				});
 			});
+		});
+	});
+
+	describe('important topics sorting', () => {
+		let regularTid;
+		let importantTid;
+		let pinnedTid;
+		let importantPinnedTid;
+
+		before(async () => {
+			async function createTopic(title) {
+				return (await topics.post({
+					uid: topic.userId,
+					title: title,
+					content: 'topic content',
+					cid: topic.categoryId,
+				})).topicData.tid;
+			}
+
+			regularTid = await createTopic('Regular topic');
+			importantTid = await createTopic('Important topic');
+			pinnedTid = await createTopic('Pinned topic');
+			importantPinnedTid = await createTopic('Important and pinned topic');
+
+			await topics.tools.markImportant(importantTid, adminUid);
+			await topics.tools.pin(pinnedTid, adminUid);
+			await topics.tools.pin(importantPinnedTid, adminUid);
+			await topics.tools.markImportant(importantPinnedTid, adminUid);
+		});
+
+		it('should sort topics with pinned > important > regular priority', async () => {
+			const result = await topics.getSortedTopics({
+				uid: adminUid,
+				cids: [topic.categoryId],
+				start: 0,
+				stop: 10,
+				sort: 'recent',
+				floatPinned: true,
+			});
+
+			const tids = result.topics.map(t => t.tid);
+			const pinnedIndex = tids.indexOf(String(pinnedTid));
+			const importantPinnedIndex = tids.indexOf(String(importantPinnedTid));
+			const importantIndex = tids.indexOf(String(importantTid));
+			const regularIndex = tids.indexOf(String(regularTid));
+
+			// Pinned topics should come before important
+			assert(pinnedIndex < importantIndex);
+			assert(importantPinnedIndex < importantIndex);
+
+			// Important topics should come before regular
+			assert(importantIndex < regularIndex);
+		});
+
+		it('should mark topic as important', async () => {
+			const isImportant = await topics.getTopicField(importantTid, 'isImportant');
+			assert.strictEqual(isImportant, 1);
+		});
+
+		it('should mark pinned topic as important', async () => {
+			const isImportant = await topics.getTopicField(importantPinnedTid, 'isImportant');
+			assert.strictEqual(isImportant, 1);
 		});
 	});
 

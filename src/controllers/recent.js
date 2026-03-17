@@ -54,7 +54,7 @@ recentController.getData = async function (req, url, sort, selectedTerm = 'allti
 		filter: filter,
 		term: term,
 		sort: sort,
-		floatPinned: req.query.pinned,
+		floatPinned: true,
 		query: req.query,
 	});
 

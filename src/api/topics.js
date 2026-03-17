@@ -153,6 +153,18 @@ topicsAPI.unpin = async function (caller, data) {
 	});
 };
 
+topicsAPI.markImportant = async function (caller, data) {
+	await doTopicAction('markImportant', 'event:topic_important', caller, {
+		tids: data.tids,
+	});
+};
+
+topicsAPI.unmarkImportant = async function (caller, data) {
+	await doTopicAction('unmarkImportant', 'event:topic_unimportant', caller, {
+		tids: data.tids,
+	});
+};
+
 topicsAPI.lock = async function (caller, data) {
 	await doTopicAction('lock', 'event:topic_locked', caller, {
 		tids: data.tids,
