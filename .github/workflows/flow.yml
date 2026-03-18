@@ -15,4 +15,5 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      - run: npx flow init
       - run: npx flow
