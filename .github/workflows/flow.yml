@@ -15,5 +15,6 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      - run: npm install --save-dev flow-bin
       - run: npx flow init
       - run: npx flow
