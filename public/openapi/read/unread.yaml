@@ -145,6 +145,9 @@ get:
                                   nullable: true
                                 isAnonymous:
                                   type: number
+                                translatedContent:
+                                  type: string
+                                  nullable: true
                                 timestampISO:
                                   type: string
                                   description: An ISO 8601 formatted date string (complementing `timestamp`)
@@ -182,6 +185,8 @@ get:
                                       example: "#f44336"
                                 index:
                                   type: number
+                                isEnglish:
+                                  type: boolean
                             tags:
                               type: array
                               items:
