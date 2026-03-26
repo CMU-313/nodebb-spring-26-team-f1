@@ -3,8 +3,8 @@
 
 const translatorApi = module.exports;
 
-translatorApi.translate = function (postData) {
-    return [false, 'This is a hardcoded translation'];
+translatorApi.translate = function () {
+	return [false, 'This is a hardcoded translation'];
 };
 
 // translatorApi.translate = async function (postData) {
