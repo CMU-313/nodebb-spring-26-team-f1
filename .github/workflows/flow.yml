@@ -16,4 +16,10 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm install --save-dev flow-bin
-      - run: npx flow
+      - name: Run Flow and save results
+        run: npx flow 2>&1 | tee flow-results.txt || true
+      - name: Upload Flow results
+        uses: actions/upload-artifact@v4
+        with:
+          name: flow-results
+          path: flow-results.txt
