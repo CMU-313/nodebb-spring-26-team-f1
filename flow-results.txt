@@ -1,1 +1,553 @@
-No errors!
+Error -------------------------------------------------------------------------------------------- _create_admin.js:3:22
+
+Cannot resolve module `path`. [cannot-resolve-module]
+
+   3| const path = require('path');
+                           ^^^^^^
+
+
+Error -------------------------------------------------------------------------------------------- _create_admin.js:4:23
+
+Cannot resolve module `nconf`. [cannot-resolve-module]
+
+   4| const nconf = require('nconf');
+                            ^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------------- _create_admin.js:6:30
+
+Cannot resolve name `__dirname`. [cannot-resolve-name]
+
+   6| nconf.file({ file: path.join(__dirname, 'config.json') });
+                                   ^^^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------------- _create_admin.js:8:12
+
+Cannot resolve name `__dirname`. [cannot-resolve-name]
+
+   8| 	base_dir: __dirname,
+                 ^^^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------------- _create_admin.js:9:25
+
+Cannot resolve name `__dirname`. [cannot-resolve-name]
+
+   9| 	upload_path: path.join(__dirname, 'public/uploads'),
+                              ^^^^^^^^^
+
+
+Error ------------------------------------------------------------------------------------------- _create_admin.js:10:23
+
+Cannot resolve name `__dirname`. [cannot-resolve-name]
+
+   10| 	views_dir: path.join(__dirname, 'build/public/templates'),
+                             ^^^^^^^^^
+
+
+Error ------------------------------------------------------------------------------------------- _create_admin.js:14:20
+
+Cannot resolve module `./src/database`. [cannot-resolve-module]
+
+   14| const db = require('./src/database');
+                          ^^^^^^^^^^^^^^^^
+
+
+Error ------------------------------------------------------------------------------------------- _create_admin.js:16:33
+
+Cannot resolve name `process`. [cannot-resolve-name]
+
+   16| 	if (err) { console.error(err); process.exit(1); }
+                                       ^^^^^^^
+
+
+Error ------------------------------------------------------------------------------------------- _create_admin.js:20:25
+
+Cannot call `user.getUidByUsername` because property `getUidByUsername` is missing in exports [1]. [prop-missing]
+
+   _create_admin.js:20:25
+   20| 	const uid = await user.getUidByUsername('maxwell2');
+                               ^^^^^^^^^^^^^^^^
+
+References:
+   src/user/index.js
+   ^^^^^^^^^^^^^^^^^ [1]
+
+
+Error ------------------------------------------------------------------------------------------- _create_admin.js:21:58
+
+Cannot resolve name `process`. [cannot-resolve-name]
+
+   21| 	if (!uid) { console.error('User "maxwell2" not found'); process.exit(1); }
+                                                                ^^^^^^^
+
+
+Error ------------------------------------------------------------------------------------------- _create_admin.js:22:15
+
+Cannot call `groups.join` because property `join` is missing in exports [1]. [prop-missing]
+
+   _create_admin.js:22:15
+   22| 	await groups.join('administrators', uid);
+                     ^^^^
+
+References:
+   src/groups/index.js
+   ^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------------------- _create_admin.js:24:2
+
+Cannot resolve name `process`. [cannot-resolve-name]
+
+   24| 	process.exit(0);
+        ^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------------- src/api/admin.js:3:22
+
+Cannot resolve module `../meta`. [cannot-resolve-module]
+
+   3| const meta = require('../meta');
+                           ^^^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------------- src/api/admin.js:4:27
+
+Cannot resolve module `../analytics`. [cannot-resolve-module]
+
+   4| const analytics = require('../analytics');
+                                ^^^^^^^^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------------- src/api/admin.js:8:18
+
+`module` may only be used as part of a legal top level export statement [invalid-export]
+
+   8| const adminApi = module.exports;
+                       ^^^^^^
+
+
+Error ------------------------------------------------------------------------------------------- src/api/admin.js:11:30
+
+Cannot get `privileges.admin` because property `admin` is missing in exports [1]. [prop-missing]
+
+   src/api/admin.js:11:30
+   11| 	const ok = await privileges.admin.can('admin:settings', caller.uid);
+                                    ^^^^^
+
+References:
+   src/privileges/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error ------------------------------------------------------------------------------------------- src/api/admin.js:11:36
+
+Cannot call `privileges.admin.can` because property `can` is missing in `void` (due to access of non-existent property
+`admin`) [1]. [incompatible-use]
+
+   src/api/admin.js:11:36
+   11| 	const ok = await privileges.admin.can('admin:settings', caller.uid);
+                                          ^^^
+
+References:
+   src/api/admin.js:11:19
+   11| 	const ok = await privileges.admin.can('admin:settings', caller.uid);
+                         ^^^^^^^^^^^^^^^^ [1]
+
+
+Error ------------------------------------------------------------------------------------------- src/api/admin.js:43:31
+
+Cannot call `groups.getNonPrivilegeGroups` because property `getNonPrivilegeGroups` is missing in exports [1].
+[prop-missing]
+
+   src/api/admin.js:43:31
+   43| 	const payload = await groups.getNonPrivilegeGroups('groups:createtime', 0, -1, { ephemeral: false });
+                                     ^^^^^^^^^^^^^^^^^^^^^
+
+References:
+   src/groups/index.js
+   ^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error ---------------------------------------------------------------------------------- src/api/assignment-tags.js:7:27
+
+`module` may only be used as part of a legal top level export statement [invalid-export]
+
+   7| const assignmentTagsAPI = module.exports;
+                                ^^^^^^
+
+
+Error --------------------------------------------------------------------------------- src/api/assignment-tags.js:12:36
+
+Missing an annotation on `uid`. [missing-local-annot]
+
+   12| async function isInstructorOrAdmin(uid) {
+                                          ^^^
+
+
+Error --------------------------------------------------------------------------------- src/api/assignment-tags.js:14:14
+
+Cannot get `privileges.users` because property `users` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:14:14
+   14| 		privileges.users.isAdministrator(uid),
+                    ^^^^^
+
+References:
+   src/privileges/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error --------------------------------------------------------------------------------- src/api/assignment-tags.js:14:20
+
+Cannot call `privileges.users.isAdministrator` because property `isAdministrator` is missing in `void` (due to access of
+non-existent property `users`) [1]. [incompatible-use]
+
+   src/api/assignment-tags.js:14:20
+   14| 		privileges.users.isAdministrator(uid),
+                          ^^^^^^^^^^^^^^^
+
+References:
+   src/api/assignment-tags.js:14:3
+   14| 		privileges.users.isAdministrator(uid),
+         ^^^^^^^^^^^^^^^^ [1]
+
+
+Error --------------------------------------------------------------------------------- src/api/assignment-tags.js:15:10
+
+Cannot call `groups.isMember` because property `isMember` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:15:10
+   15| 		groups.isMember(uid, 'instructors'),
+                ^^^^^^^^
+
+References:
+   src/groups/index.js
+   ^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error --------------------------------------------------------------------------------- src/api/assignment-tags.js:34:30
+
+Cannot call `assignmentTags.create` because property `create` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:34:30
+   34| 	return await assignmentTags.create({
+                                    ^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error --------------------------------------------------------------------------------- src/api/assignment-tags.js:51:30
+
+Cannot call `assignmentTags.getAll` because property `getAll` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:51:30
+   51| 	return await assignmentTags.getAll();
+                                    ^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error --------------------------------------------------------------------------------- src/api/assignment-tags.js:67:35
+
+Cannot call `assignmentTags.get` because property `get` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:67:35
+   67| 	const tag = await assignmentTags.get(data.id);
+                                         ^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error --------------------------------------------------------------------------------- src/api/assignment-tags.js:89:30
+
+Cannot call `assignmentTags.update` because property `update` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:89:30
+   89| 	return await assignmentTags.update(data.id, {
+                                    ^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:110:23
+
+Cannot call `assignmentTags.delete` because property `delete` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:110:23
+   110| 	await assignmentTags.delete(data.id);
+                              ^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:127:23
+
+Cannot call `assignmentTags.addToPost` because property `addToPost` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:127:23
+   127| 	await assignmentTags.addToPost(data.pid, data.tagId);
+                              ^^^^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:128:30
+
+Cannot call `assignmentTags.getPostTags` because property `getPostTags` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:128:30
+   128| 	return await assignmentTags.getPostTags(data.pid);
+                                     ^^^^^^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:145:23
+
+Cannot call `assignmentTags.removeFromPost` because property `removeFromPost` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:145:23
+   145| 	await assignmentTags.removeFromPost(data.pid, data.tagId);
+                              ^^^^^^^^^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:146:30
+
+Cannot call `assignmentTags.getPostTags` because property `getPostTags` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:146:30
+   146| 	return await assignmentTags.getPostTags(data.pid);
+                                     ^^^^^^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:162:30
+
+Cannot call `assignmentTags.getPostTags` because property `getPostTags` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:162:30
+   162| 	return await assignmentTags.getPostTags(data.pid);
+                                     ^^^^^^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:179:23
+
+Cannot call `assignmentTags.setPostTags` because property `setPostTags` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:179:23
+   179| 	await assignmentTags.setPostTags(data.pid, data.tagIds);
+                              ^^^^^^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:180:30
+
+Cannot call `assignmentTags.getPostTags` because property `getPostTags` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:180:30
+   180| 	return await assignmentTags.getPostTags(data.pid);
+                                     ^^^^^^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:196:30
+
+Cannot call `assignmentTags.getTagPosts` because property `getTagPosts` is missing in exports [1]. [prop-missing]
+
+   src/api/assignment-tags.js:196:30
+   196| 	return await assignmentTags.getTagPosts(data.id);
+                                     ^^^^^^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------- src/api/assignment-tags.js:216:30
+
+Cannot call `assignmentTags.filterPostsByTags` because property `filterPostsByTags` is missing in exports [1].
+[prop-missing]
+
+   src/api/assignment-tags.js:216:30
+   216| 	return await assignmentTags.filterPostsByTags(data.pids, data.tags);
+                                     ^^^^^^^^^^^^^^^^^
+
+References:
+   src/assignment-tags/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error --------------------------------------------------------------------------------------- src/api/categories.js:3:22
+
+Cannot resolve module `../meta`. [cannot-resolve-module]
+
+   3| const meta = require('../meta');
+                           ^^^^^^^^^
+
+
+Error --------------------------------------------------------------------------------------- src/api/categories.js:6:24
+
+Cannot resolve module `../events`. [cannot-resolve-module]
+
+   6| const events = require('../events');
+                             ^^^^^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:10:29
+
+Cannot resolve module `../activitypub`. [cannot-resolve-module]
+
+   10| const activitypub = require('../activitypub');
+                                   ^^^^^^^^^^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:11:23
+
+Cannot resolve module `../utils`. [cannot-resolve-module]
+
+   11| const utils = require('../utils');
+                             ^^^^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:13:23
+
+`module` may only be used as part of a legal top level export statement [invalid-export]
+
+   13| const categoriesAPI = module.exports;
+                             ^^^^^^
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:15:34
+
+Missing an annotation on `uid`. [missing-local-annot]
+
+   15| const hasAdminPrivilege = async (uid, privilege = 'categories') => {
+                                        ^^^
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:15:39
+
+Missing an annotation on `privilege`. [missing-local-annot]
+
+   15| const hasAdminPrivilege = async (uid, privilege = 'categories') => {
+                                             ^^^^^^^^^
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:16:30
+
+Cannot get `privileges.admin` because property `admin` is missing in exports [1]. [prop-missing]
+
+   src/api/categories.js:16:30
+   16| 	const ok = await privileges.admin.can(`admin:${privilege}`, uid);
+                                    ^^^^^
+
+References:
+   src/privileges/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:16:36
+
+Cannot call `privileges.admin.can` because property `can` is missing in `void` (due to access of non-existent property
+`admin`) [1]. [incompatible-use]
+
+   src/api/categories.js:16:36
+   16| 	const ok = await privileges.admin.can(`admin:${privilege}`, uid);
+                                          ^^^
+
+References:
+   src/api/categories.js:16:19
+   16| 	const ok = await privileges.admin.can(`admin:${privilege}`, uid);
+                         ^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:24:33
+
+Cannot call `categories.getCidsByPrivilege` because property `getCidsByPrivilege` is missing in exports [1].
+[prop-missing]
+
+   src/api/categories.js:24:33
+   24| 		const cids = await categories.getCidsByPrivilege('categories:cid', caller.uid, 'find');
+                                       ^^^^^^^^^^^^^^^^^^
+
+References:
+   src/categories/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:25:27
+
+Cannot call `categories.getCategoriesData` because property `getCategoriesData` is missing in exports [1].
+[prop-missing]
+
+   src/api/categories.js:25:27
+   25| 		return await categories.getCategoriesData(cids);
+                                 ^^^^^^^^^^^^^^^^^
+
+References:
+   src/categories/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+Error --------------------------------------------------------------------------------------- src/api/categories.js:29:8
+
+Cannot call `user.isAdministrator` because property `isAdministrator` is missing in exports [1]. [prop-missing]
+
+   src/api/categories.js:29:8
+   29| 		user.isAdministrator(caller.uid),
+              ^^^^^^^^^^^^^^^
+
+References:
+   src/user/index.js
+   ^^^^^^^^^^^^^^^^^ [1]
+
+
+Error -------------------------------------------------------------------------------------- src/api/categories.js:40:14
+
+Cannot get `privileges.categories` because property `categories` is missing in exports [1]. [prop-missing]
+
+   src/api/categories.js:40:14
+   40| 		privileges.categories.get(data.cid, caller.uid),
+                    ^^^^^^^^^^
+
+References:
+   src/privileges/index.js
+   ^^^^^^^^^^^^^^^^^^^^^^^ [1]
+
+
+
+... 3120 more errors (only 50 out of 3170 errors displayed)
+To see all errors, re-run Flow with --show-all-errors
