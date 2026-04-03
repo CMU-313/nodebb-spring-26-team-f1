@@ -124,6 +124,10 @@ if (document.readyState === 'loading') {
 		require(['forum/assignment-tags'], function (AssignmentTags) {
 			AssignmentTags.init();
 		});
+
+		require(['forum/anonymous-post'], function (AnonymousPost) {
+			AnonymousPost.init();
+		});
 	};
 
 	app.require = async function (modules) {
