@@ -4,7 +4,7 @@
 const translatorApi = module.exports;
 
 translatorApi.translate = async function (postData) {
-	const TRANSLATOR_API = 'http://172.17.0.1:5000';
+	const TRANSLATOR_API = process.env.TRANSLATOR_API || 'http://127.0.0.1:5000';
 	try {
 		const response = await fetch(TRANSLATOR_API + '/?content=' + encodeURIComponent(postData.content));
 		const data = await response.json();
