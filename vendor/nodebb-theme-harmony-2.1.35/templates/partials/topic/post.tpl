@@ -86,8 +86,15 @@
 			<div class="sensitive-content-message">
 			<a class="btn btn-sm btn-primary view-translated-btn">Click here to view the translated message.</a>
 			</div>
-			<div class="translated-content" style="display:none;">
-			{posts.translatedContent}
+			<div class="translated-message-box" style="display:none;">
+				<div class="card mt-2">
+					<div class="card-header">
+						<h6 class="mb-0">Translated Message</h6>
+					</div>
+					<div class="card-body">
+						{posts.translatedContent}
+					</div>
+				</div>
 			</div>
 	        {{{end}}}
 		</div>

@@ -81,14 +81,17 @@ define('forum/topic', [
 
 	function configurePostToggle() {
 		$('.topic').on('click', '.view-translated-btn', function () {
-			// Toggle the visibility of the next .translated-content div
-			$(this).closest('.sensitive-content-message').next('.translated-content').toggle();
-			// Optionally, change the button text based on visibility
-			var isVisible = $(this).closest('.sensitive-content-message').next('.translated-content').is(':visible');
+			const translatedBox = $(this).closest('.sensitive-content-message').next('.translated-message-box');
+			const isVisible = translatedBox.is(':visible');
+			
 			if (isVisible) {
-				$(this).text('Hide the translated message.');
-			} else {
+				// Hide the translated message box
+				translatedBox.fadeOut(250);
 				$(this).text('Click here to view the translated message.');
+			} else {
+				// Show the translated message box
+				translatedBox.fadeIn(250);
+				$(this).text('Hide the translated message.');
 			}
 		});
 	}
